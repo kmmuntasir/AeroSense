@@ -1,49 +1,75 @@
-# Trello Board Structure: AeroSense MVP
+# Relational Trello Board Structure: AeroSense MVP
 
-## 1. Lists (Columns)
-Set up your board with these lists from left to right:
-1. **Project Reference:** API docs, design assets, and high-level Epic descriptions.
-2. **Product Backlog:** All pending User Stories and Foundational Tasks.
-3. **To Do (Next Up):** The 2-3 cards queued up for immediate development.
-4. **In Progress:** The 1-2 cards you are actively coding.
-5. **Done:** Completed, tested, and merged features.
+## 1. The Lists (Columns)
+Set up your board with these exact lists, reading left to right.
+
+**Static Directories (These cards never move):**
+1. **📁 Epics:** High-level product goals.
+2. **📄 Stories:** User-focused features.
+
+**Active Pipeline (Tasks flow through these):**
+3. **📦 Backlog:** All technical tasks waiting to be picked up.
+4. **🎯 To Do:** Tasks queued for the current coding session.
+5. **🏗️ In Progress:** Tasks you are actively writing code for.
+6. **👀 In Review:** Code is written, pending testing/refactoring.
+7. **✅ Done:** Fully completed and tested tasks.
 
 ---
 
-## 2. Labels (Epics & Categories)
-Press `L` on your keyboard to create and apply these labels:
-* 🔴 **Red:** `Core/Foundation` (Tasks 1, 2, 3)
+## 2. The Labels
+Use labels to track categories and mark static cards as complete.
 * 🔵 **Blue:** `Epic 1: Onboarding`
 * 🟢 **Green:** `Epic 2: Core Weather`
 * 🟡 **Yellow:** `Epic 3: Location Mgmt`
 * 🟣 **Purple:** `Epic 4: Settings`
+* 🔴 **Red:** `Core/Foundation`
+* 🟩 **Bright Green:** `Status: Delivered` *(Apply this to Epic and Story cards only when all their child tasks hit the "Done" list).*
 
 ---
 
-## 3. Card Templates
+## 3. Card Templates & Linking Strategy
+*Pro-tip: Instead of just pasting URLs into the text description, click the **"Attachment"** button on the card and paste the Trello URL there. It creates a clean, clickable visual widget.*
 
-### Template A: Foundational Tech Tasks
-*Use this for broad architectural tasks (Tasks 1, 2, and 3) that don't fit a specific user story.*
-
-**Title:** `[Task Number]: [Task Name]` (e.g., *Task 1: Project Setup & Foundation*)
-**Label:** 🔴 `Core/Foundation`
+### Template A: The Epic Card
+**List:** 📁 Epics
+**Title:** `[Epic Number]: [Epic Name]` (e.g., *Epic 1: Onboarding & First Launch*)
+**Label:** 🔵 `Epic 1: Onboarding`
 **Description:**
-> **Description:** [Paste the description from the task list]
-> **Dependencies:** [List dependencies]
-**Checklist (Action Items):**
-* [ ] [Paste bulleted action items here as checkable tasks]
+> **Overview:** > [Brief description of the Epic's goal]
+>
+> **🔗 Child Stories:**
+> * [Attach Trello URL for Story 1.1]
+> * [Attach Trello URL for Story 1.2]
 
-### Template B: User Story Cards
-*Use this for all product features. The User Story is the Card; the Technical Tasks are the Checklist.*
-
+### Template B: The Story Card
+**List:** 📄 Stories
 **Title:** `[US Number]: [Feature Name]` (e.g., *US 1.1: Requesting Location Permission*)
-**Label:** [Match to specific Epic color]
+**Label:** 🔵 `Epic 1: Onboarding`
 **Description:**
-> **As a** [user type],
-> **I want** [action/feature],
-> **So that** [value/benefit].
+> **⬆️ Parent Epic:** [Attach Trello URL for Epic 1]
+> 
+> **User Story:**
+> **As a** new user launching the app,
+> **I want** to be prompted to grant location access,
+> **So that** the app can automatically fetch my local weather.
 > 
 > **Interaction & Steps:**
-> [Paste the steps and UI changes from the user story]
-**Checklist (Dev Tasks):**
-* [ ] [Extract and paste the relevant bulleted action items from the corresponding Technical Task (Tasks 4-10)]
+> 1. User opens the installed app.
+> 2. App displays OS permission dialog.
+> 3. Transition to Dashboard (if granted) or Search (if denied).
+> 
+> **🔗 Child Tasks:**
+> * [Attach Trello URL for Task 4.1 - Permission Logic]
+> * [Attach Trello URL for Task 4.2 - Routing]
+
+### Template C: The Task Card
+**List:** Starts in 📦 Backlog -> Moves to ✅ Done
+**Title:** `[Task Number]: [Technical Task]` (e.g., *Task 4.1: Implement LocationController Permission Logic*)
+**Label:** 🔵 `Epic 1: Onboarding`
+**Description:**
+> **⬆️ Parent Story:** [Attach Trello URL for US 1.1]
+> 
+> **Technical Details:**
+> * Integrate the native location permission prompt flow managed by `LocationController`.
+> * Verify permissions using `geolocator`.
+> * Handle exceptions if the user permanently denies access.
