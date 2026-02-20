@@ -11,6 +11,9 @@ This document breaks down the user stories and requirements into actionable, tec
 
 **Dependencies:** None.
 
+**🎨 Design Reference:**
+- [Splash Screen](https://www.figma.com/design/nbEaJycmx0bstnYhVfTJ86/AeroSense?node-id=10-155)
+
 **Action Items:**
 *   Initialize a new Flutter project named `aero_sense`.
 *   Configure the core directory structure (`lib/app/`, `lib/data/`, `lib/modules/`, `lib/core/`).
@@ -83,6 +86,12 @@ This document breaks down the user stories and requirements into actionable, tec
 
 **Dependencies:** Completion of Task 3.
 
+**🎨 Design References:**
+- [Onboarding - Location Access](https://www.figma.com/design/nbEaJycmx0bstnYhVfTJ86/AeroSense?node-id=10-173)
+- [Onboarding - Notifications](https://www.figma.com/design/nbEaJycmx0bstnYhVfTJ86/AeroSense?node-id=10-209)
+- [Onboarding - Get Started](https://www.figma.com/design/nbEaJycmx0bstnYhVfTJ86/AeroSense?node-id=10-245)
+- [Initial Search / Empty State](https://www.figma.com/design/nbEaJycmx0bstnYhVfTJ86/AeroSense?node-id=11-1181)
+
 **Action Items:**
 *   Create the initial app loading view (Splash screen or a clean loading indicator).
 *   Integrate the native location permission prompt flow managed by `LocationController`.
@@ -98,6 +107,9 @@ This document breaks down the user stories and requirements into actionable, tec
 **Description:** Construct the primary, glanceable focal point of the application based on the design guidelines.
 
 **Dependencies:** Completion of Tasks 3 and 4.
+
+**🎨 Design Reference:**
+- [Weather Dashboard](https://www.figma.com/design/nbEaJycmx0bstnYhVfTJ86/AeroSense?node-id=10-285)
 
 **Action Items:**
 *   Create the `DashboardView` structure.
@@ -141,11 +153,14 @@ This document breaks down the user stories and requirements into actionable, tec
 
 ---
 
-## Task 8: UI Development - Search 
+## Task 8: UI Development - Search
 
 **Description:** Build the Geocoding search UI to allow users to find different cities.
 
 **Dependencies:** Completion of Task 3.
+
+**🎨 Design Reference:**
+- [Search & Locations](https://www.figma.com/design/nbEaJycmx0bstnYhVfTJ86/AeroSense?node-id=10-513)
 
 **Action Items:**
 *   Implement a `TextField` with debouncing (e.g., wait 500ms after typing stops before calling the API) to prevent hitting rate limits during typing.
@@ -178,6 +193,33 @@ This document breaks down the user stories and requirements into actionable, tec
 **Description:** Build the user interface for managing app preferences.
 
 **Dependencies:** Completion of Task 3.
+
+**🎨 Design Reference:**
+- [Settings & Customization](https://www.figma.com/design/nbEaJycmx0bstnYhVfTJ86/AeroSense?node-id=10-775)
+
+---
+
+## Additional Features (Beyond Original MVP Scope)
+
+These features were designed by the designer but were not part of the original MVP specification:
+
+### Task 11: UI Development - Weather Alerts
+
+**Description:** Build the weather alerts screen to notify users of severe weather conditions.
+
+**Dependencies:** Completion of Task 5.
+
+**🎨 Design Reference:**
+- [Weather Alerts](https://www.figma.com/design/nbEaJycmx0bstnYhVfTJ86/AeroSense?node-id=10-651)
+
+### Task 12: UI Development - Detailed Forecast
+
+**Description:** Build the detailed forecast view for extended weather information.
+
+**Dependencies:** Completion of Task 7.
+
+**🎨 Design Reference:**
+- [Detailed Forecast](https://www.figma.com/design/nbEaJycmx0bstnYhVfTJ86/AeroSense?node-id=10-934)
 
 **Action Items:**
 *   Create a clean, simple `SettingsView` (accessible via the app bar or a drawer).

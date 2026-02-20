@@ -14,6 +14,7 @@
 ## 1. Onboarding & First Launch (Journey 1)
 
 ### 1.1 Native Splash Screen (The First 0.5 Seconds)
+**🎨 [Figma Design](https://www.figma.com/design/nbEaJycmx0bstnYhVfTJ86/AeroSense?node-id=10-155)**
 *   **Visuals:** A solid, uninterrupted background matching the system theme (Off-White or Deep Slate). Dead-center is the AeroSense app icon (Sky Indigo).
 *   **Typography:** No typography is present to avoid clutter and prevent flashing before the Flutter engine renders fonts.
 *   **Interaction:** Holds statically until the OS hands over to the app's first frame.
@@ -25,6 +26,7 @@
     *   **User taps "Deny":** The screen slides up (bottom-to-top transition) into the **Initial Search/Empty State View**.
 
 ### 1.3 Initial Search / Empty State View (Location Denied)
+**🎨 [Figma Design](https://www.figma.com/design/nbEaJycmx0bstnYhVfTJ86/AeroSense?node-id=11-1181)**
 *   **Layout:** Centered content with generous top padding to feel breathable.
 *   **Visuals:**
     *   *Optional:* A polished, solid-color line icon (magnifying glass over a globe) sits above the text.
@@ -43,6 +45,8 @@
 ---
 
 ## 2. The Core Weather Dashboard (Journey 2: Daily Check)
+
+**🎨 [Figma Design](https://www.figma.com/design/nbEaJycmx0bstnYhVfTJ86/AeroSense?node-id=10-285)**
 
 This view is the heart of the app. It must communicate the entire current situation within a 1-2 second glance without scrolling.
 
@@ -99,6 +103,8 @@ Focuses on the long-term trend.
 
 ## 3. Locations Management & Search (Journey 3)
 
+**🎨 [Figma Design](https://www.figma.com/design/nbEaJycmx0bstnYhVfTJ86/AeroSense?node-id=10-513)**
+
 ### 3.1 Saved Locations Hub
 *   **Access:** Tapping the top-left menu icon on the dashboard.
 *   **Transition:** The view slides up from the bottom (modal style) or slides in from the left (drawer style).
@@ -118,6 +124,8 @@ Focuses on the long-term trend.
 
 ## 4. Settings & Preferences (Journey 4)
 
+**🎨 [Figma Design](https://www.figma.com/design/nbEaJycmx0bstnYhVfTJ86/AeroSense?node-id=10-775)**
+
 ### 4.1 Settings View
 *   **Access:** Tapping the top-right gear icon on the dashboard.
 *   **Transition:** Standard right-to-left navigation push.
@@ -132,3 +140,17 @@ Focuses on the long-term trend.
         *   Text: "App Theme".
         *   Control: Segmented control or a clean dropdown. Options: System | Light | Dark.
     *   *Effect:* Changes made here immediately recalculate the UI stack beneath it. When the user taps 'Back', the Dashboard is already fully updated with the new units/colors without requiring a refresh.
+
+---
+
+## 5. Additional Features (Designer Additions)
+
+### 5.1 Weather Alerts
+**🎨 [Figma Design](https://www.figma.com/design/nbEaJycmx0bstnYhVfTJ86/AeroSense?node-id=10-651)**
+
+*Note: This feature was not part of the original MVP specification but was designed by the designer as an enhancement.*
+
+### 5.2 Detailed Forecast
+**🎨 [Figma Design](https://www.figma.com/design/nbEaJycmx0bstnYhVfTJ86/AeroSense?node-id=10-934)**
+
+*Note: This feature was not part of the original MVP specification but was designed by the designer as an enhancement.*

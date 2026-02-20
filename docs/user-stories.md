@@ -6,6 +6,13 @@
 
 ## Epic 1: Onboarding & First Launch
 
+**🎨 Design References:**
+- [Splash Screen](https://www.figma.com/design/nbEaJycmx0bstnYhVfTJ86/AeroSense?node-id=10-155)
+- [Onboarding - Location Access](https://www.figma.com/design/nbEaJycmx0bstnYhVfTJ86/AeroSense?node-id=10-173)
+- [Onboarding - Notifications](https://www.figma.com/design/nbEaJycmx0bstnYhVfTJ86/AeroSense?node-id=10-209)
+- [Onboarding - Get Started](https://www.figma.com/design/nbEaJycmx0bstnYhVfTJ86/AeroSense?node-id=10-245)
+- [Initial Search / Empty State](https://www.figma.com/design/nbEaJycmx0bstnYhVfTJ86/AeroSense?node-id=11-1181)
+
 ### User Story 1.1: Requesting Location Permission
 **As a** new user launching the app for the first time,
 **I want** to be prompted to grant location access,
@@ -36,6 +43,8 @@
 ---
 
 ## Epic 2: The Core Weather Dashboard
+
+**🎨 Design Reference:** [Weather Dashboard](https://www.figma.com/design/nbEaJycmx0bstnYhVfTJ86/AeroSense?node-id=10-285)
 
 ### User Story 2.1: Viewing Glanceable Current Weather
 **As a** user opening the app for my daily check,
@@ -89,6 +98,8 @@
 
 ## Epic 3: Location Management & Search
 
+**🎨 Design Reference:** [Search & Locations](https://www.figma.com/design/nbEaJycmx0bstnYhVfTJ86/AeroSense?node-id=10-513)
+
 ### User Story 3.1: Accessing Saved Locations Hub
 **As a** user,
 **I want** to access a specific area where my saved cities are listed,
@@ -127,6 +138,8 @@
 ---
 
 ## Epic 4: Settings & App Launch Experience
+
+**🎨 Design Reference:** [Settings & Customization](https://www.figma.com/design/nbEaJycmx0bstnYhVfTJ86/AeroSense?node-id=10-775)
 
 ### User Story 4.1: Seamless Native App Launch
 **As a** user tapping the app icon,
@@ -178,3 +191,23 @@
 *   **Task 8 (UI - Search):** Build the Geocoding search UI with debounce logic.
 *   **Task 9 (UI - Locations Management):** Build the Saved Locations Hub with swipe-to-delete functionality and local storage persistence.
 *   **Task 10 (UI - Settings):** Build the Settings view to toggle temperature units and app theme, and bind to `SettingsController`.
+
+---
+
+## Epic 5: Additional Features (Designer Additions)
+
+*Note: These features were not part of the original MVP specification but were designed by the designer as enhancements.*
+
+### User Story 5.1: Viewing Weather Alerts
+**As a** user concerned about severe weather,
+**I want** to receive alerts about dangerous weather conditions,
+**So that** I can take appropriate safety measures.
+
+**🎨 Design Reference:** [Weather Alerts](https://www.figma.com/design/nbEaJycmx0bstnYhVfTJ86/AeroSense?node-id=10-651)
+
+### User Story 5.2: Viewing Detailed Forecast
+**As a** user planning for specific times,
+**I want** to see a more detailed breakdown of weather conditions,
+**So that** I can make more informed decisions about my activities.
+
+**🎨 Design Reference:** [Detailed Forecast](https://www.figma.com/design/nbEaJycmx0bstnYhVfTJ86/AeroSense?node-id=10-934)
