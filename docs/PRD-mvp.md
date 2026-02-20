@@ -34,6 +34,7 @@ To build a lightning-fast, highly intuitive weather app that doesn't just show n
     *   **Meaningful Insight (Crucial MVP Feature):** A short, dynamic text string providing immediate context.
         *   *Examples:* "Rain expected around 3:00 PM.", "High UV index today, wear sunscreen.", "Colder than yesterday."
         *   The designer must allocate UI space for this dynamic 1-2 sentence text block.
+    *   **Pull-to-Refresh:** The dashboard must support a manual pull-down gesture to instantly refresh all weather data for the current location.
 
 ### Feature 2: 24-Hour Short-Term Forecast
 *   **Goal:** Help the user plan their immediate day/evening.
@@ -63,6 +64,18 @@ To build a lightning-fast, highly intuitive weather app that doesn't just show n
     *   **Data in Saved Locations List:** Each saved city item must show: City Name, Current Temp, Current Condition Icon, and Local Time.
     *   **Action:** Ability to add/remove a city from the saved list.
 
+### Feature 5: User Settings
+*   **Goal:** Allow users to customize their weather experience.
+*   **Required Interactions & Elements:**
+    *   **Unit Toggle:** A clear switch or toggle between Celsius (°C) and Fahrenheit (°F). This preference must apply app-wide.
+    *   **Theme Toggle (Optional for MVP, but recommended):** A toggle between System Default, Light Mode, and Dark Mode.
+
+### Feature 6: Native App Launch Experience
+*   **Goal:** Ensure the app feels like a premium, native installation from the moment it is tapped.
+*   **Required Elements:**
+    *   **App Icon:** A distinct, branded launcher icon for iOS and Android.
+    *   **Native Splash Screen:** A branded loading screen that appears instantly upon launch while the Flutter engine initializes, matching the brand colors to prevent white/black screen flashing.
+
 ---
 
 ## 4. User Flow Definitions
@@ -76,9 +89,10 @@ To build a lightning-fast, highly intuitive weather app that doesn't just show n
 *   User opens app -> Lands directly on Dashboard for their primary/current location.
 *   User scrolls down (or swipes) -> Sees 24-hour forecast, then 7-day outlook.
 
-### Managing Locations:
+### Managing Locations & Settings:
 1.  User taps "Locations" icon -> Opens Saved Locations list.
 2.  User taps "Search" -> Types city -> Selects from list -> Views that city's weather -> Taps "Add to favorites" (optional).
+3.  User taps "Settings" (usually gear icon) -> Toggles temperature unit -> Interface instantly updates to reflect new unit.
 
 ---
 
@@ -86,7 +100,7 @@ To build a lightning-fast, highly intuitive weather app that doesn't just show n
 
 To help the designer understand the exact data formats coming from Open-Meteo that the UI needs to accommodate:
 
-*   **Temperatures:** Whole numbers (e.g., 72° or 22°). User toggle between F/C will be needed in settings eventually, but for design, just assume up to 3 characters + degree symbol.
+*   **Temperatures:** Whole numbers (e.g., 72° or 22°). The user can toggle between F/C in the new Settings view. The UI must accommodate up to 3 characters plus the degree symbol.
 *   **Precipitation:** Percentages (e.g., 45%).
 *   **Weather Codes:** Open-Meteo uses WMO codes (0-99). The dev will map these to specific conditions (Clear, Cloudy, Fog, Rain, Snow, Thunderstorm). The designer needs to prepare an icon set covering these 6-8 basic categories.
 
