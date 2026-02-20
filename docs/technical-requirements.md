@@ -1,6 +1,6 @@
 # Technical Requirements Document (TRD)
 
-**Product Name:** AeroSense (MVP)
+**Product Name:** AeroSense (MVP) - "Making sense of the sky"
 **Framework:** Flutter (Latest Version)
 **State Management & Routing:** GetX
 **Data Provider:** Open-Meteo API (Free, no API key)

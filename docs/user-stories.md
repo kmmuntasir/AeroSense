@@ -1,6 +1,6 @@
 # User Stories & Task Definitions
 
-**Product:** AeroSense (MVP)
+**Product:** AeroSense (MVP) - "Making sense of the sky"
 
 ---
 
@@ -54,7 +54,7 @@
     *   **Meaningful Insights Block:** A dynamically generated sentence (e.g., "Rain expected around 3:00 PM."). The background color of the UI may subtly reflect the current condition (e.g., warm tones for hot weather).
 
 ### User Story 2.1b: Manual Pull-to-Refresh
-**As a** user who has had the app open for a while,
+**As a** user who has had AeroSense open for a while,
 **I want** to manually pull down on the dashboard,
 **So that** I can force the app to fetch the absolute latest weather data.
 
@@ -140,7 +140,7 @@
 
 ### User Story 4.2: Toggling Temperature Units
 **As a** user with a preference for Celsius or Fahrenheit,
-**I want** to globally change the temperature unit used in the app,
+**I want** to globally change the temperature unit used in AeroSense,
 **So that** the data is meaningful to me without mental math.
 
 *   **Interaction & Steps:**
@@ -151,7 +151,7 @@
 
 ### User Story 4.3: App Theme Toggle (Optional)
 **As a** user who prefers a specific visual style or wants to reduce eye strain at night,
-**I want** to toggle the app's theme between System Default, Light Mode, and Dark Mode,
+**I want** to toggle AeroSense's theme between System Default, Light Mode, and Dark Mode,
 **So that** the app visually matches my device preference or current environment.
 
 *   **Interaction & Steps:**

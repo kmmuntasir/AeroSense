@@ -1,6 +1,6 @@
 # Brand & UI Guidelines
 
-**Product:** [App Name] Weather App MVP
+**Product:** AeroSense MVP - "Making sense of the sky"
 
 ---
 
@@ -14,7 +14,7 @@
 
 ## 2. Color Palette
 
-The app should heavily rely on a clean base, allowing semantic weather colors to pop and draw the eye instantly. Both Light and Dark modes are highly recommended for weather apps.
+The app should heavily rely on a clean base, allowing semantic weather colors to pop and draw the eye instantly. Both Light and Dark modes are highly recommended for weather apps like AeroSense.
 
 ### Core Colors
 *   **Background (Light Mode):** Crisp Off-White (e.g., `#F8F9FA`) to reduce eye strain compared to pure white.
@@ -33,7 +33,7 @@ These colors are crucial for instantly conveying temperature and conditions with
 
 ## 3. Typography
 
-The most critical aspect of the app is legibility. Numbers (temperatures) and short text blocks must be readable at a glance, potentially while the user is walking or outside in bright sunlight.
+The most critical aspect of AeroSense is legibility. Numbers (temperatures) and short text blocks must be readable at a glance, potentially while the user is walking or outside in bright sunlight.
 
 *   **Primary Typeface:** A highly legible, modern geometric sans-serif.
     *   *Recommendations:* Inter, SF Pro (iOS native), Roboto (Android native), or Plus Jakarta Sans.

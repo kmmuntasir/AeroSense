@@ -1,4 +1,5 @@
 # AeroSense API Documentation
+**Slogan:** "Making sense of the sky"
 
 This document outlines the specific endpoints from the Open-Meteo API that are required for the AeroSense MVP.
 

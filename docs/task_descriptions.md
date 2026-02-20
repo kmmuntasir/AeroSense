@@ -1,4 +1,5 @@
 # AeroSense MVP Task Descriptions
+**Slogan:** "Making sense of the sky"
 
 This document breaks down the user stories and requirements into actionable, technical tasks for development. Each task is detailed to provide clear instructions for implementation, along with explicit dependencies.
 

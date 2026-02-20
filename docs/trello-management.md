@@ -1,4 +1,5 @@
 # Relational Trello Board Structure: AeroSense MVP
+**Slogan:** "Making sense of the sky"
 
 ## 1. The Lists (Columns)
 Set up your board with these exact lists, reading left to right.

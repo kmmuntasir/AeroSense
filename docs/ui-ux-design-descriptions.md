@@ -1,4 +1,5 @@
 # AeroSense MVP: UI & UX Design Descriptions
+**Slogan:** "Making sense of the sky"
 
 **Document Purpose:** This document serves as the visual and interaction blueprint for the AeroSense MVP, derived directly from the PRD, Brand Guidelines, User Stories, and Task Descriptions. It details the precise layout, typography hierarchy, visual states, and micro-interactions for every user journey.
 

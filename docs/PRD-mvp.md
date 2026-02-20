@@ -1,6 +1,6 @@
 # Product Requirements Document (PRD)
 
-**Product Name:** [App Name] (MVP)
+**Product Name:** AeroSense (MVP) - "Making sense of the sky"
 **Document Owner:** Product Manager / Founder
 **Target Audience:** General smartphone users looking for quick, actionable weather information.
 **Data Source:** Open-Meteo API (No API keys required, free tier).
@@ -9,7 +9,7 @@
 
 ## 1. Product Vision & Objective
 
-To build a lightning-fast, highly intuitive weather app that doesn't just show numbers, but provides meaningful, actionable insights for the user's day. The MVP will focus strictly on the most crucial weather data points that impact daily decision-making (e.g., "Do I need an umbrella?", "Should I wear a jacket?").
+To build a lightning-fast, highly intuitive AeroSense app that doesn't just show numbers, but provides meaningful, actionable insights for the user's day. The MVP will focus strictly on the most crucial weather data points that impact daily decision-making (e.g., "Do I need an umbrella?", "Should I wear a jacket?").
 
 ---
 
@@ -71,7 +71,7 @@ To build a lightning-fast, highly intuitive weather app that doesn't just show n
     *   **Theme Toggle (Optional for MVP, but recommended):** A toggle between System Default, Light Mode, and Dark Mode.
 
 ### Feature 6: Native App Launch Experience
-*   **Goal:** Ensure the app feels like a premium, native installation from the moment it is tapped.
+*   **Goal:** Ensure AeroSense feels like a premium, native installation from the moment it is tapped.
 *   **Required Elements:**
     *   **App Icon:** A distinct, branded launcher icon for iOS and Android.
     *   **Native Splash Screen:** A branded loading screen that appears instantly upon launch while the Flutter engine initializes, matching the brand colors to prevent white/black screen flashing.
