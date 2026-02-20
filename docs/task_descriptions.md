@@ -103,9 +103,9 @@ This document breaks down the user stories and requirements into actionable, tec
 *   Implement Typography styling referencing `GoogleFonts` and enabling `tabularFigures`.
 *   Bind the UI to the `WeatherController` to reactively display:
     *   Current Location Name.
-    *   Large Current Temperature (respecting the `SettingsController` unit preference).
+    *   Large Current Temperature (respecting the `SettingsController` unit preference, formatted as a whole number).
     *   Weather condition text description.
-    *   "Feels Like", High, and Low temperatures (respecting unit preference).
+    *   "Feels Like", High, and Low temperatures (respecting unit preference, formatted as whole numbers).
 *   Implement the UI container for the "Meaningful Insights" string.
 *   Implement logic to dynamically map the Open-Meteo WMO weather code to SVG icon assets.
 *   **Pull-to-Refresh:** Wrap the primary scrollable view (containing the dashboard and forecasts) in a `RefreshIndicator` widget, binding its `onRefresh` callback to the `WeatherController.fetchWeather()` method.
@@ -121,7 +121,7 @@ This document breaks down the user stories and requirements into actionable, tec
 **Action Items:**
 *   Implement a horizontal `ListView.builder`.
 *   Format API timestamps into readable hours (e.g., "3 PM") using the `intl` package.
-*   Display hour, icon, temperature, and precipitation chance (conditionally shown if > 0%).
+*   Display hour, icon, temperature (formatted as a whole number), and precipitation chance (conditionally shown if > 0%).
 *   Ensure the list view updates reactively based on data from the `WeatherController`.
 
 ---
@@ -135,7 +135,7 @@ This document breaks down the user stories and requirements into actionable, tec
 **Action Items:**
 *   Implement a vertical `ListView.builder` or static `Column` below the 24-hour section.
 *   Format dates into day names (e.g., "Mon", "Tue").
-*   Display the day name, icon, and the daily high/low temperatures.
+*   Display the day name, icon, and the daily high/low temperatures (formatted as whole numbers).
 *   Ensure the list updates reactively based on data from the `WeatherController`.
 
 ---
@@ -164,7 +164,7 @@ This document breaks down the user stories and requirements into actionable, tec
 *   **Locations Hub View:**
     *   Create a dedicated screen/drawer for saved cities.
     *   Bind to the `LocationController`'s `savedCities` RxList.
-    *   Implement a `ListView` displaying each saved city with its summary weather data (City Name, Temp, Icon).
+    *   Implement a `ListView` displaying each saved city with its summary weather data (City Name, Temp, Icon, Local Time).
     *   Implement swipe-to-delete functionality.
 *   **Favorites Toggle:**
     *   Implement the "Add to Favorites" toggle button on the dashboard header.

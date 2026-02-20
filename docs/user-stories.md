@@ -149,6 +149,17 @@
 *   **Outcome:** The preference is saved to local storage immediately.
 *   **Change in App's View:** The UI instantly recalculates and re-renders every visible temperature on the dashboard, 24-hour forecast, and 7-day outlook without requiring a new API call or app restart.
 
+### User Story 4.3: App Theme Toggle (Optional)
+**As a** user who prefers a specific visual style or wants to reduce eye strain at night,
+**I want** to toggle the app's theme between System Default, Light Mode, and Dark Mode,
+**So that** the app visually matches my device preference or current environment.
+
+*   **Interaction & Steps:**
+    1.  User taps the "Settings" icon.
+    2.  User taps a toggle or list selecting the desired theme (Light/Dark/System).
+*   **Outcome:** The preference is saved to local storage immediately.
+*   **Change in App's View:** The app's entire UI color palette instantly transitions to the selected theme without requiring a restart.
+
 ---
 
 ## Technical Tasks Summary (For Developer/GetX Setup)
@@ -166,4 +177,4 @@
 *   **Task 7 (UI - Daily Forecast):** Build the vertical 7-day list.
 *   **Task 8 (UI - Search):** Build the Geocoding search UI with debounce logic.
 *   **Task 9 (UI - Locations Management):** Build the Saved Locations Hub with swipe-to-delete functionality and local storage persistence.
-*   **Task 10 (UI - Settings):** Build the Settings view to toggle temperature units and bind to `SettingsController`.
+*   **Task 10 (UI - Settings):** Build the Settings view to toggle temperature units and app theme, and bind to `SettingsController`.
