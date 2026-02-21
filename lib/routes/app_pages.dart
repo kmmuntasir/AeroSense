@@ -4,6 +4,7 @@ import '../presentation/pages/search/search_page.dart';
 import '../presentation/pages/dashboard/dashboard_page.dart';
 import '../presentation/bindings/onboarding_binding.dart';
 import '../core/bindings/location_binding.dart';
+import '../core/bindings/weather_binding.dart';
 
 class AppPages {
   static const initial = '/onboarding';
@@ -30,7 +31,7 @@ class AppPages {
     GetPage(
       name: '/dashboard',
       page: () => const DashboardPage(),
-      binding: LocationBinding(),
+      binding: WeatherBinding(),
       transition: Transition.cupertino,
     ),
   ];
