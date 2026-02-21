@@ -2,80 +2,14 @@
 trigger: always_on
 ---
 
-# Single Task Workflow
-
-Follow this workflow when implementing a new feature, bug fix, or any task.
-
-## 1. Gather Requirements
-
-- Read the task description/ticket/card carefully
-- Identify requirements, acceptance criteria, and constraints
-- If ambiguous, ask the user for clarification
-- If Figma designs are referenced, review them (use Figma MCP if available)
-
-## 2. Create Branch
-
-```bash
-# Format: type/AERO-TICKET-description
-git checkout -b feature/AERO-123-add-search-feature
-# or if no ticket: git checkout -b feature/add-search-feature
-```
-
-**Never work in `main` or `dev` branch.**
-
-## 3. Analyze & Plan
-
-- Explore the codebase to understand relevant architecture
-- Identify files that need to be modified/created
-- Consider Flutter/GetX patterns, testing requirements
-- Create a step-by-step plan in `./docs/task-AERO-123-plan.md`
-
-**Ask for user review and approval before implementing.**
-
-## 4. Get Approval
-
-- Present the plan to the user
-- Incorporate feedback if suggested
-- **Wait for explicit permission to start implementation**
-
-## 5. Implement
-
-- After approval, create task tracking in your context
-- Implement step-by-step following the plan
-- Follow Flutter/GetX development rules
-- Write tests as you go (unit, widget, integration)
-- Run `flutter analyze` and `dart format .` regularly
-
-## 6. Test & Verify
-
-```bash
-flutter test
-flutter test integration_test/
-flutter analyze
-```
-
-Ensure all tests pass and code is clean.
-
-## 7. Commit & Push
-
-```bash
-git add .
-git commit -m "AERO-123: Add search functionality"
-git push origin feature/AERO-123-add-search-feature
-```
-
-Follow git guidelines for commit messages.
-
-## 8. Complete Task
-
-- Move ticket/card to "In Review" status/column
-- Summarize changes to the user
-- Include: what was done, files changed, tests added, any notes
-
-## Workflow Summary
-
-```
-Gather → Branch → Plan → Approve → Implement → Test → Commit → Complete
-```
-
-**Do not skip the planning and approval steps.**
+When a task is given, follow this workflow:
+- Gather the requirements from the relevant JIRA/Trello card description and comments.
+- If the requirements are not clear or ambiguous, ask for clarification to the user.
+- If the task involves a Figma frame (link may be found in the description or comments), use the Figma MCP to get the data for that frame.
+- The task needs to be started in it's own branch. Follow the git guidelines for creating a new branch if necessary. If you are already in the branch, skip this step. Never start the task in the 'main' or 'dev' branch.
+- After gathering all the necessary requirements, when in the correct branch, analyze the repository and codebase, think about the solution, and create a plan containing step by step todo list of items to complete. Write the plan in the ./docs folder and ask for user review and wait for confirmation. DO NOT IMMEDIATELY START TO IMPLEMENT WITHOUT AUTHORIZATION.
+- If the user suggests changes, implement the changes in the plan.
+- Finally when the user approves and gives you explicitly the permission to start the implementation, move the Jira Ticket/Trello Card to "In Progress" status/column, then create a todo list in your context for this plan, and start implementing step by step.
+- When the implementation is complete, make sure that relevant unit/widget test and integration tests are written properly.
+- After completion, commit the changes according to the git guidelines, then push to remote.
+- Finally, move the Jira Ticket/Trello Card to the "In Review" column, and summarize the changes to the user, then stop.
