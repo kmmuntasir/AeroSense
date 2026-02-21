@@ -11,5 +11,6 @@ When a task is given, follow this workflow:
 - If the user suggests changes, implement the changes in the plan.
 - Finally when the user approves and gives you explicitly the permission to start the implementation, move the Jira Ticket/Trello Card to "In Progress" status/column, then create a todo list in your context for this plan, and start implementing step by step.
 - When the implementation is complete, make sure that relevant unit/widget test and integration tests are written properly.
-- After completion, commit the changes according to the git guidelines, then push to remote.
+- After completion, verify the implmentation against the original plan file created at the beginning and make sure that all the steps are completed and the implementation is correct.
+- After verification, remove the plan file from the ./docs folder, commit the changes according to the git guidelines, then push to remote.
 - Finally, move the Jira Ticket/Trello Card to the "In Review" column, and summarize the changes to the user, then stop.
