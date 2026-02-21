@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'package:aero_sense/core/models/geocoding_response.dart';
 import 'package:aero_sense/core/services/api_client.dart';
 
@@ -224,5 +225,29 @@ class GeocodingProvider {
   /// Validates if coordinates are within valid latitude and longitude ranges
   bool isValidCoordinates(double latitude, double longitude) {
     return latitude >= -90 && latitude <= 90 && longitude >= -180 && longitude <= 180;
+  }
+
+  /// Calculates distance between two coordinates using Haversine formula
+  double calculateDistance({
+    required double lat1,
+    required double lon1,
+    required double lat2,
+    required double lon2,
+  }) {
+    const double earthRadius = 6371; // Earth's radius in kilometers
+
+    final double dLat = _toRadians(lat2 - lat1);
+    final double dLon = _toRadians(lon2 - lon1);
+
+    final double a = (math.sin(dLat / 2) * math.sin(dLat / 2)) +
+        (math.cos(_toRadians(lat1)) * math.cos(_toRadians(lat2)) * math.sin(dLon / 2) * math.sin(dLon / 2));
+
+    final double c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a));
+
+    return earthRadius * c;
+  }
+
+  double _toRadians(double degrees) {
+    return degrees * (math.pi / 180);
   }
 }
