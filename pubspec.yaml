@@ -1,5 +1,5 @@
 name: aero_sense
-description: "AeroSense - Advanced drone flight analytics and safety management"
+description: "AeroSense - Making sense of the sky. A beautiful, intuitive weather app."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
@@ -52,6 +52,8 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
 
+  test: ^1.24.0
+
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
   # activated in the `analysis_options.yaml` file located at the root of your
@@ -61,6 +63,22 @@ dev_dependencies:
 
   # Splash Screen Generator
   flutter_native_splash: ^2.4.1
+
+# Flutter Native Splash Screen Configuration
+flutter_native_splash:
+  # Light mode background color (Off-white from brand guidelines)
+  color: "#F8F9FA"
+  # Dark mode background color (Deep Slate from brand guidelines)
+  color_dark: "#121212"
+  # Fullscreen mode
+  fullscreen: false
+  # Info.plist for iOS
+  ios: true
+  # Android 12+ support
+  android_12:
+    # Splash screen background color
+    color: "#F8F9FA"
+    color_dark: "#121212"
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
