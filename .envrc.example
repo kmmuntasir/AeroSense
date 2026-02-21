@@ -1,0 +1,21 @@
+# AeroSense - direnv configuration
+# =============================================================================
+#
+# This file is for direnv users who want automatic environment variable loading
+#
+# SETUP:
+# 1. Install direnv: sudo apt install direnv  # Ubuntu/Debian
+# 2. Add to shell: eval "$(direnv hook bash)"  # or zsh
+# 3. Copy this file: cp .envrc.example .envrc
+# 4. Allow direnv: direnv allow
+#
+# Variables will be automatically loaded when you cd into this directory
+# and unloaded when you cd out.
+#
+# =============================================================================
+
+# Load environment variables from .env.local
+dotenv .env.local
+
+# Optional: Add project-specific bin to PATH
+# export PATH="${PWD}/node_modules/.bin:${PATH}"

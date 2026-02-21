@@ -61,8 +61,14 @@ app.*.map.json
 # =============================================================================
 # Environment Variables
 # =============================================================================
+# Ignore all .env files except .env.example (template)
 .env*
+!.env.example
 .env.*.*
+
+# Ignore direnv .envrc files (but allow .envrc.example template)
+.envrc
+!.envrc.example
 
 # =============================================================================
 # Generated JavaScript files
