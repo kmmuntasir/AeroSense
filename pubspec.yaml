@@ -42,8 +42,8 @@ dependencies:
   dio: ^5.4.0
 
   # Location Services
-  geolocator: ^12.0.0
-  permission_handler: ^11.2.0
+  geolocator: ^14.0.2
+  permission_handler: ^12.0.1
 
   # Local Storage
   get_storage: ^2.1.1
