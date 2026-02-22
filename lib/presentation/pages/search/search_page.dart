@@ -64,7 +64,9 @@ class _SearchPageState extends State<SearchPage> {
     final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF121212) : const Color(0xFFF8F9FA),
+      backgroundColor: isDark
+          ? const Color(0xFF121212)
+          : const Color(0xFFF8F9FA),
       body: SafeArea(
         child: Column(
           children: [
@@ -74,11 +76,19 @@ class _SearchPageState extends State<SearchPage> {
               child: Column(
                 children: [
                   const SizedBox(height: 16),
-                  // Search icon (optional visual)
-                  Icon(
-                    Icons.search,
-                    size: 48,
-                    color: const Color(0xFF4A90E2),
+                  // Avatar badge
+                  Container(
+                    width: 64,
+                    height: 64,
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.primary,
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.person_pin_circle,
+                      color: Colors.white,
+                      size: 36,
+                    ),
                   ),
                   const SizedBox(height: 24),
                   // Headline
@@ -104,7 +114,9 @@ class _SearchPageState extends State<SearchPage> {
                   Container(
                     height: 56,
                     decoration: BoxDecoration(
-                      color: isDark ? const Color(0xFF2A2D32) : const Color(0xFFEDEDED),
+                      color: isDark
+                          ? const Color(0xFF2A2D32)
+                          : const Color(0xFFEDEDED),
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: TextField(
@@ -114,7 +126,9 @@ class _SearchPageState extends State<SearchPage> {
                       decoration: InputDecoration(
                         hintText: 'Search city...',
                         hintStyle: TextStyle(
-                          color: isDark ? Colors.white38 : const Color(0xFF9CA3AF),
+                          color: isDark
+                              ? Colors.white38
+                              : const Color(0xFF9CA3AF),
                         ),
                         prefixIcon: const Icon(
                           Icons.search,
@@ -142,7 +156,9 @@ class _SearchPageState extends State<SearchPage> {
                 if (_isSearching.value) {
                   return const Center(
                     child: CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF4A90E2)),
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        Color(0xFF4A90E2),
+                      ),
                     ),
                   );
                 }
@@ -150,11 +166,11 @@ class _SearchPageState extends State<SearchPage> {
                 if (_searchResults.isEmpty) {
                   return Center(
                     child: Text(
-                      _searchController.text.isEmpty
-                          ? ''
-                          : 'No cities found',
+                      _searchController.text.isEmpty ? '' : 'No cities found',
                       style: theme.textTheme.bodyMedium?.copyWith(
-                        color: isDark ? Colors.white60 : const Color(0xFF6B7280),
+                        color: isDark
+                            ? Colors.white60
+                            : const Color(0xFF6B7280),
                       ),
                     ),
                   );
@@ -163,7 +179,8 @@ class _SearchPageState extends State<SearchPage> {
                 return ListView.separated(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   itemCount: _searchResults.length,
-                  separatorBuilder: (context, index) => const SizedBox(height: 8),
+                  separatorBuilder: (context, index) =>
+                      const SizedBox(height: 8),
                   itemBuilder: (context, index) {
                     final location = _searchResults[index];
                     return Container(
@@ -180,7 +197,9 @@ class _SearchPageState extends State<SearchPage> {
                           width: 40,
                           height: 40,
                           decoration: BoxDecoration(
-                            color: const Color(0xFF4A90E2).withValues(alpha: 0.1),
+                            color: const Color(
+                              0xFF4A90E2,
+                            ).withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: const Icon(
@@ -193,13 +212,17 @@ class _SearchPageState extends State<SearchPage> {
                           location.name,
                           style: theme.textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.bold,
-                            color: isDark ? Colors.white : const Color(0xFF121212),
+                            color: isDark
+                                ? Colors.white
+                                : const Color(0xFF121212),
                           ),
                         ),
                         subtitle: Text(
                           location.formattedLocation,
                           style: theme.textTheme.bodyMedium?.copyWith(
-                            color: isDark ? Colors.white60 : const Color(0xFF6B7280),
+                            color: isDark
+                                ? Colors.white60
+                                : const Color(0xFF6B7280),
                           ),
                         ),
                         onTap: () => _onLocationSelected(location),
