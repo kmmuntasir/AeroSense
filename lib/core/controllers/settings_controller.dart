@@ -2,13 +2,17 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:aero_sense/core/controllers/weather_controller.dart';
 import 'package:aero_sense/core/models/temperature_unit.dart';
+import 'package:aero_sense/core/models/wind_speed_unit.dart';
+import 'package:aero_sense/core/models/precipitation_unit.dart';
 
 class SettingsController extends GetxController {
   final GetStorage _storage = GetStorage();
 
   // Reactive variables
   final RxBool _isDarkMode = RxBool(false);
-  final Rx<TemperatureUnit> _temperatureUnit = Rx<TemperatureUnit>(TemperatureUnit.celsius);
+  final Rx<TemperatureUnit> _temperatureUnit = Rx<TemperatureUnit>(
+    TemperatureUnit.celsius,
+  );
   final RxBool _notificationsEnabled = RxBool(true);
   final RxBool _locationServicesEnabled = RxBool(true);
   final RxBool _autoRefreshEnabled = RxBool(true);
@@ -16,6 +20,13 @@ class SettingsController extends GetxController {
   final RxInt _dataRetentionDays = RxInt(30); // days
   final RxString _appLanguage = RxString('en');
   final RxBool _flightWarningsEnabled = RxBool(true);
+  final RxBool _useSystemTheme = RxBool(true);
+  final RxBool _severeWeatherAlerts = RxBool(true);
+  final RxBool _morningNotifications = RxBool(false);
+  final Rx<WindSpeedUnit> _windSpeedUnit = Rx<WindSpeedUnit>(WindSpeedUnit.kmh);
+  final Rx<PrecipitationUnit> _precipitationUnit = Rx<PrecipitationUnit>(
+    PrecipitationUnit.mm,
+  );
 
   // Getters
   bool get isDarkMode => _isDarkMode.value;
@@ -27,6 +38,11 @@ class SettingsController extends GetxController {
   int get dataRetentionDays => _dataRetentionDays.value;
   String get appLanguage => _appLanguage.value;
   bool get flightWarningsEnabled => _flightWarningsEnabled.value;
+  bool get useSystemTheme => _useSystemTheme.value;
+  bool get severeWeatherAlerts => _severeWeatherAlerts.value;
+  bool get morningNotifications => _morningNotifications.value;
+  WindSpeedUnit get windSpeedUnit => _windSpeedUnit.value;
+  PrecipitationUnit get precipitationUnit => _precipitationUnit.value;
 
   // Setters
   set isDarkMode(bool value) {
@@ -80,6 +96,31 @@ class SettingsController extends GetxController {
     _storage.write('flight_warnings_enabled', value);
   }
 
+  set useSystemTheme(bool value) {
+    _useSystemTheme.value = value;
+    _storage.write('use_system_theme', value);
+  }
+
+  set severeWeatherAlerts(bool value) {
+    _severeWeatherAlerts.value = value;
+    _storage.write('severe_weather_alerts', value);
+  }
+
+  set morningNotifications(bool value) {
+    _morningNotifications.value = value;
+    _storage.write('morning_notifications', value);
+  }
+
+  set windSpeedUnit(WindSpeedUnit value) {
+    _windSpeedUnit.value = value;
+    _storage.write('wind_speed_unit', value.name);
+  }
+
+  set precipitationUnit(PrecipitationUnit value) {
+    _precipitationUnit.value = value;
+    _storage.write('precipitation_unit', value.name);
+  }
+
   @override
   void onInit() {
     super.onInit();
@@ -102,14 +143,37 @@ class SettingsController extends GetxController {
       }
 
       // Load notification settings
-      _notificationsEnabled.value = _storage.read('notifications_enabled') ?? true;
-      _locationServicesEnabled.value = _storage.read('location_services_enabled') ?? true;
+      _notificationsEnabled.value =
+          _storage.read('notifications_enabled') ?? true;
+      _locationServicesEnabled.value =
+          _storage.read('location_services_enabled') ?? true;
       _autoRefreshEnabled.value = _storage.read('auto_refresh_enabled') ?? true;
       _autoRefreshInterval.value = _storage.read('auto_refresh_interval') ?? 30;
       _dataRetentionDays.value = _storage.read('data_retention_days') ?? 30;
       _appLanguage.value = _storage.read('app_language') ?? 'en';
-      _flightWarningsEnabled.value = _storage.read('flight_warnings_enabled') ?? true;
+      _flightWarningsEnabled.value =
+          _storage.read('flight_warnings_enabled') ?? true;
+      _useSystemTheme.value = _storage.read('use_system_theme') ?? true;
+      _severeWeatherAlerts.value =
+          _storage.read('severe_weather_alerts') ?? true;
+      _morningNotifications.value =
+          _storage.read('morning_notifications') ?? false;
 
+      final windUnit = _storage.read('wind_speed_unit');
+      if (windUnit != null) {
+        _windSpeedUnit.value = WindSpeedUnit.values.firstWhere(
+          (u) => u.name == windUnit,
+          orElse: () => WindSpeedUnit.kmh,
+        );
+      }
+
+      final precipUnit = _storage.read('precipitation_unit');
+      if (precipUnit != null) {
+        _precipitationUnit.value = PrecipitationUnit.values.firstWhere(
+          (u) => u.name == precipUnit,
+          orElse: () => PrecipitationUnit.mm,
+        );
+      }
     } catch (e) {
       // Handle error loading settings - silently fail with defaults
     }
@@ -131,6 +195,11 @@ class SettingsController extends GetxController {
       _dataRetentionDays.value = 30;
       _appLanguage.value = 'en';
       _flightWarningsEnabled.value = true;
+      _useSystemTheme.value = true;
+      _severeWeatherAlerts.value = true;
+      _morningNotifications.value = false;
+      _windSpeedUnit.value = WindSpeedUnit.kmh;
+      _precipitationUnit.value = PrecipitationUnit.mm;
 
       // Update weather controller
       if (Get.isRegistered<WeatherController>()) {
@@ -140,6 +209,25 @@ class SettingsController extends GetxController {
     } catch (e) {
       throw Exception('Failed to reset settings: ${e.toString()}');
     }
+  }
+
+  /// Clear all user data and reset to initial state (used on log out)
+  Future<void> clearAllData() async {
+    _storage.erase();
+    _isDarkMode.value = false;
+    _temperatureUnit.value = TemperatureUnit.celsius;
+    _notificationsEnabled.value = true;
+    _locationServicesEnabled.value = true;
+    _autoRefreshEnabled.value = true;
+    _autoRefreshInterval.value = 30;
+    _dataRetentionDays.value = 30;
+    _appLanguage.value = 'en';
+    _flightWarningsEnabled.value = true;
+    _useSystemTheme.value = true;
+    _severeWeatherAlerts.value = true;
+    _morningNotifications.value = false;
+    _windSpeedUnit.value = WindSpeedUnit.kmh;
+    _precipitationUnit.value = PrecipitationUnit.mm;
   }
 
   /// Export settings to JSON string
@@ -200,7 +288,6 @@ class SettingsController extends GetxController {
         // In a real app, you'd filter by last accessed time
         _storage.remove('saved_locations');
       }
-
     } catch (e) {
       throw Exception('Failed to clear cached data: ${e.toString()}');
     }
@@ -219,7 +306,8 @@ class SettingsController extends GetxController {
     }
 
     // Language should be a valid ISO code
-    if (appLanguage.length != 2 || !RegExp(r'^[a-z]{2}$').hasMatch(appLanguage)) {
+    if (appLanguage.length != 2 ||
+        !RegExp(r'^[a-z]{2}$').hasMatch(appLanguage)) {
       return false;
     }
 
@@ -230,7 +318,9 @@ class SettingsController extends GetxController {
   Map<String, dynamic> getSettingsSummary() {
     return {
       'theme': isDarkMode ? 'Dark' : 'Light',
-      'temperature_unit': temperatureUnit == TemperatureUnit.celsius ? 'Celsius' : 'Fahrenheit',
+      'temperature_unit': temperatureUnit == TemperatureUnit.celsius
+          ? 'Celsius'
+          : 'Fahrenheit',
       'notifications': notificationsEnabled ? 'Enabled' : 'Disabled',
       'location_services': locationServicesEnabled ? 'Enabled' : 'Disabled',
       'auto_refresh': autoRefreshEnabled ? 'Enabled' : 'Disabled',

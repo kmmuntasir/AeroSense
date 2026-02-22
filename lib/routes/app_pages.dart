@@ -2,8 +2,10 @@ import 'package:get/get.dart';
 import '../presentation/pages/onboarding/onboarding_page.dart';
 import '../presentation/pages/search/search_page.dart';
 import '../presentation/pages/dashboard/dashboard_page.dart';
+import '../presentation/pages/settings/settings_page.dart';
 import '../presentation/bindings/onboarding_binding.dart';
 import '../core/bindings/location_binding.dart';
+import '../core/bindings/settings_binding.dart';
 
 class AppPages {
   static const initial = '/onboarding';
@@ -31,6 +33,14 @@ class AppPages {
       name: '/dashboard',
       page: () => const DashboardPage(),
       binding: LocationBinding(),
+      transition: Transition.cupertino,
+    ),
+
+    // Settings
+    GetPage(
+      name: '/settings',
+      page: () => const SettingsPage(),
+      binding: SettingsBinding(),
       transition: Transition.cupertino,
     ),
   ];
