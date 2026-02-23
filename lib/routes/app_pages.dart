@@ -5,16 +5,28 @@ import '../presentation/pages/dashboard/dashboard_page.dart';
 import '../presentation/pages/settings/settings_page.dart';
 import '../presentation/pages/shell/main_shell_page.dart';
 import '../presentation/pages/forecast_details/forecast_details_page.dart';
+import '../presentation/pages/weather_alerts/weather_alerts_page.dart';
 import '../presentation/controllers/forecast_details_controller.dart';
+import '../presentation/controllers/weather_alerts_controller.dart';
 import '../presentation/bindings/onboarding_binding.dart';
 import '../presentation/bindings/main_shell_binding.dart';
 import '../core/bindings/location_binding.dart';
 import '../core/bindings/settings_binding.dart';
 
 class AppPages {
-  static const initial = '/forecast-details';
+  static const initial = '/weather-alerts';
 
   static final routes = [
+    // Weather Alerts - standalone for development/testing
+    GetPage(
+      name: '/weather-alerts',
+      page: () => const WeatherAlertsPage(),
+      binding: BindingsBuilder(
+        () => Get.lazyPut(() => WeatherAlertsController()),
+      ),
+      transition: Transition.cupertino,
+    ),
+
     // Forecast Details - standalone for development/testing
     GetPage(
       name: '/forecast-details',

@@ -37,6 +37,13 @@ class AppTheme {
   static const Color uvModerate = Color(0xFFFFC107);
   static const Color uvHigh = Color(0xFFFF5722);
 
+  // Map placeholder colors
+  static const Color mapOcean = Color(0xFF7DB8C0);
+  static const Color mapLand = Color(0xFFE8D5B5);
+
+  // Error family
+  static const Color errorDark = Color(0xFF991B1B);
+
   // Light theme
   static ThemeData get lightTheme {
     return ThemeData(
@@ -53,11 +60,13 @@ class AppTheme {
         onPrimary: Colors.white,
         onSecondary: Colors.white,
         onSurface: lightTextPrimary,
-        onError: Colors.white,
+        onSurfaceVariant: lightHintText,
+        onError: errorDark,
         surfaceContainer: Color(0xFFF0F4FF),
         surfaceContainerHighest: buttonBackground,
         primaryContainer: Color(0xFFEEF2FF),
         tertiaryContainer: Color(0xFFFFF8E8),
+        errorContainer: Color(0xFFFFDAD6),
       ),
       appBarTheme: const AppBarTheme(
         elevation: 0,
@@ -120,6 +129,12 @@ class AppTheme {
         ),
         bodyLarge: TextStyle(fontSize: 16, color: lightTextPrimary),
         bodyMedium: TextStyle(fontSize: 14, color: lightHintText),
+        bodySmall: TextStyle(fontSize: 12, color: lightHintText, height: 1.2),
+        labelSmall: TextStyle(
+          fontSize: 12,
+          color: lightHintText,
+          letterSpacing: 0.6,
+        ),
       ),
     );
   }
