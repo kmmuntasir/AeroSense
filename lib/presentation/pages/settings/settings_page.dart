@@ -1,384 +1,537 @@
-import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:aero_sense/core/controllers/settings_controller.dart';
 import 'package:aero_sense/core/models/temperature_unit.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
-class SettingsPage extends StatelessWidget {
+class SettingsPage extends GetView<SettingsController> {
   const SettingsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.find<SettingsController>();
-
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Settings'),
-        centerTitle: true,
-        elevation: 0,
-      ),
-      body: ListView(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        children: [
-          // ── Appearance ──────────────────────────────────
-          _SectionHeader(title: 'Appearance'),
-          const SizedBox(height: 12),
-          _SettingsTile(
-            icon: Icons.palette_outlined,
-            title: 'Theme',
-            subtitle: 'Choose your preferred look',
-            trailing: Obx(
-              () => SegmentedButton<bool>(
-                segments: const [
-                  ButtonSegment(
-                    value: false,
-                    label: Text('Light'),
-                    icon: Icon(Icons.light_mode, size: 18),
-                  ),
-                  ButtonSegment(
-                    value: true,
-                    label: Text('Dark'),
-                    icon: Icon(Icons.dark_mode, size: 18),
-                  ),
-                ],
-                selected: {controller.isDarkMode},
-                onSelectionChanged: (v) => controller.isDarkMode = v.first,
-              ),
-            ),
-          ),
-          const SizedBox(height: 12),
-          _SettingsTile(
-            icon: Icons.refresh_outlined,
-            title: 'Auto-refresh',
-            subtitle: 'Update weather automatically',
-            trailing: Obx(
-              () => Switch(
-                value: controller.autoRefreshEnabled,
-                onChanged: (value) => controller.autoRefreshEnabled = value,
-              ),
-            ),
-          ),
-          const SizedBox(height: 24),
-
-          // ── Units ────────────────────────────────────────
-          _SectionHeader(title: 'Units'),
-          const SizedBox(height: 12),
-          _SettingsTile(
-            icon: Icons.thermostat_outlined,
-            title: 'Temperature',
-            subtitle: 'Select display unit',
-            trailing: Obx(
-              () => SegmentedButton<TemperatureUnit>(
-                segments: const [
-                  ButtonSegment(
-                    value: TemperatureUnit.celsius,
-                    label: Text('°C'),
-                  ),
-                  ButtonSegment(
-                    value: TemperatureUnit.fahrenheit,
-                    label: Text('°F'),
-                  ),
-                ],
-                selected: {controller.temperatureUnit},
-                onSelectionChanged: (v) => controller.temperatureUnit = v.first,
-              ),
-            ),
-          ),
-          const SizedBox(height: 24),
-
-          // ── Notifications & Services ────────────────────
-          _SectionHeader(title: 'Notifications & Services'),
-          const SizedBox(height: 12),
-          _SettingsTile(
-            icon: Icons.notifications_outlined,
-            title: 'Notifications',
-            subtitle: 'Receive weather alerts',
-            trailing: Obx(
-              () => Switch(
-                value: controller.notificationsEnabled,
-                onChanged: (value) => controller.notificationsEnabled = value,
-              ),
-            ),
-          ),
-          const SizedBox(height: 12),
-          _SettingsTile(
-            icon: Icons.location_on_outlined,
-            title: 'Location Services',
-            subtitle: 'Use GPS for location',
-            trailing: Obx(
-              () => Switch(
-                value: controller.locationServicesEnabled,
-                onChanged: (value) =>
-                    controller.locationServicesEnabled = value,
-              ),
-            ),
-          ),
-          const SizedBox(height: 24),
-
-          // ── Data Management ──────────────────────────────
-          _SectionHeader(title: 'Data Management'),
-          const SizedBox(height: 12),
-          _ActionTile(
-            icon: Icons.delete_outline,
-            title: 'Clear Cache',
-            subtitle: 'Remove cached weather data',
-            onTap: () async {
-              await controller.clearCachedData();
-              Get.snackbar(
-                'Success',
-                'Cache cleared',
-                snackPosition: SnackPosition.BOTTOM,
-              );
-            },
-          ),
-          const SizedBox(height: 12),
-          _ActionTile(
-            icon: Icons.restart_alt_outlined,
-            title: 'Reset to Defaults',
-            subtitle: 'Restore all settings to default',
-            onTap: () {
-              Get.dialog(
-                AlertDialog(
-                  title: const Text('Reset Settings?'),
-                  content: const Text(
-                    'This will restore all settings to their default values.',
-                  ),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Get.back(),
-                      child: const Text('Cancel'),
-                    ),
-                    TextButton(
-                      onPressed: () async {
-                        await controller.resetToDefaults();
-                        Get.back();
-                        Get.snackbar(
-                          'Success',
-                          'Settings reset to defaults',
-                          snackPosition: SnackPosition.BOTTOM,
-                        );
-                      },
-                      child: const Text('Reset'),
-                    ),
-                  ],
-                ),
-              );
-            },
-          ),
-          const SizedBox(height: 24),
-
-          // ── About ────────────────────────────────────────
-          _SectionHeader(title: 'About'),
-          const SizedBox(height: 12),
-          _InfoTile(
-            icon: Icons.info_outline,
-            title: 'Version',
-            subtitle: 'AeroSense 1.0.0',
-          ),
-          const SizedBox(height: 12),
-          _InfoTile(
-            icon: Icons.description_outlined,
-            title: 'License',
-            subtitle: 'MIT License',
-          ),
-          const SizedBox(height: 32),
-        ],
-      ),
-    );
-  }
-}
-
-/// Section header widget for settings groups
-class _SectionHeader extends StatelessWidget {
-  final String title;
-
-  const _SectionHeader({required this.title});
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Text(
-      title,
-      style: theme.textTheme.labelLarge?.copyWith(
-        fontWeight: FontWeight.w600,
-        color: theme.colorScheme.primary,
-        letterSpacing: 0.5,
-      ),
-    );
-  }
-}
-
-/// Settings tile widget for toggle switches
-class _SettingsTile extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final String subtitle;
-  final Widget trailing;
-
-  const _SettingsTile({
-    required this.icon,
-    required this.title,
-    required this.subtitle,
-    required this.trailing,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-
-    return Container(
-      decoration: BoxDecoration(
-        color: colorScheme.surfaceContainer,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: colorScheme.outlineVariant, width: 1),
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      child: Row(
-        children: [
-          Icon(icon, color: colorScheme.primary, size: 24),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+      appBar: AppBar(title: Text('Settings')),
+      body: SafeArea(
+        child: ListView(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+          children: [
+            // ── Units ─────────────────────────────────────
+            const _SectionLabel(label: 'UNITS'),
+            const SizedBox(height: 8),
+            _SettingsCard(
               children: [
-                Text(
-                  title,
-                  style: theme.textTheme.bodyLarge?.copyWith(
-                    fontWeight: FontWeight.w500,
+                _TemperatureRow(controller: controller),
+                const _CardDivider(),
+                _NavigationRow(
+                  icon: Icons.air,
+                  iconColor: const Color(0xFF5B8DEF),
+                  label: 'Wind Speed',
+                  value: 'km/h',
+                  onTap: () {},
+                ),
+                const _CardDivider(),
+                _NavigationRow(
+                  icon: Icons.water_drop_outlined,
+                  iconColor: const Color(0xFF4FC3F7),
+                  label: 'Precipitation',
+                  value: 'mm',
+                  onTap: () {},
+                ),
+              ],
+            ),
+            const SizedBox(height: 24),
+
+            // ── Appearance ────────────────────────────────
+            const _SectionLabel(label: 'APPEARANCE'),
+            const SizedBox(height: 8),
+            _SettingsCard(
+              children: [
+                Obx(
+                  () => _SwitchRow(
+                    icon: Icons.nightlight_round,
+                    iconColor: const Color(0xFF7986CB),
+                    label: 'Dark Mode',
+                    value: controller.isDarkMode,
+                    onChanged: (v) => controller.isDarkMode = v,
                   ),
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  subtitle,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
+                const _CardDivider(),
+                Obx(
+                  () => _SwitchRow(
+                    icon: Icons.settings_display_outlined,
+                    iconColor: const Color(0xFF42A5F5),
+                    label: 'Use System Setting',
+                    value: controller.locationServicesEnabled,
+                    onChanged: (v) => controller.locationServicesEnabled = v,
                   ),
                 ),
               ],
             ),
+            const SizedBox(height: 24),
+
+            // ── Notifications ─────────────────────────────
+            const _SectionLabel(label: 'NOTIFICATIONS'),
+            const SizedBox(height: 8),
+            _SettingsCard(
+              children: [
+                Obx(
+                  () => _SwitchRow(
+                    icon: Icons.warning_amber_rounded,
+                    iconColor: const Color(0xFFEF5350),
+                    label: 'Severe Weather',
+                    value: controller.notificationsEnabled,
+                    onChanged: (v) => controller.notificationsEnabled = v,
+                  ),
+                ),
+                const _CardDivider(),
+                Obx(
+                  () => _SwitchRow(
+                    icon: Icons.wb_sunny_outlined,
+                    iconColor: const Color(0xFFFFA726),
+                    label: 'Morning Summary',
+                    value: controller.flightWarningsEnabled,
+                    onChanged: (v) => controller.flightWarningsEnabled = v,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 24),
+
+            // ── About & Support ───────────────────────────
+            const _SectionLabel(label: 'ABOUT & SUPPORT'),
+            const SizedBox(height: 8),
+            _SettingsCard(
+              children: [
+                _NavigationRow(
+                  icon: Icons.help_outline_rounded,
+                  iconColor: const Color(0xFF26A69A),
+                  label: 'Help Center',
+                  onTap: () {},
+                ),
+                const _CardDivider(),
+                _NavigationRow(
+                  icon: Icons.lock_outline_rounded,
+                  iconColor: const Color(0xFFAB47BC),
+                  label: 'Privacy Policy',
+                  onTap: () {},
+                ),
+                const _CardDivider(),
+                const _InfoRow(
+                  icon: Icons.info_outline_rounded,
+                  iconColor: Color(0xFF78909C),
+                  label: 'App Version',
+                  value: 'v2.4.1',
+                ),
+              ],
+            ),
+            const SizedBox(height: 32),
+
+            // ── Log Out ───────────────────────────────────
+            _SettingsCard(
+              children: [
+                InkWell(
+                  onTap: () => _showLogOutDialog(context),
+                  borderRadius: BorderRadius.circular(14),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    child: Center(
+                      child: Text(
+                        'Log Out',
+                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          color: Theme.of(context).colorScheme.error,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 24),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showLogOutDialog(BuildContext context) {
+    Get.dialog(
+      AlertDialog(
+        title: const Text('Log Out'),
+        content: const Text('Are you sure you want to log out?'),
+        actions: [
+          TextButton(onPressed: () => Get.back(), child: const Text('Cancel')),
+          TextButton(
+            onPressed: () => Get.back(),
+            child: Text(
+              'Log Out',
+              style: TextStyle(color: Theme.of(context).colorScheme.error),
+            ),
           ),
-          const SizedBox(width: 16),
-          trailing,
         ],
       ),
     );
   }
 }
 
-/// Action tile widget for clickable settings
-class _ActionTile extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final String subtitle;
-  final VoidCallback onTap;
+// ── Section Label ─────────────────────────────────────────────────────────────
 
-  const _ActionTile({
-    required this.icon,
-    required this.title,
-    required this.subtitle,
-    required this.onTap,
-  });
+class _SectionLabel extends StatelessWidget {
+  final String label;
+
+  const _SectionLabel({required this.label});
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
-        child: Container(
-          decoration: BoxDecoration(
-            color: colorScheme.surfaceContainer,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: colorScheme.outlineVariant, width: 1),
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          child: Row(
-            children: [
-              Icon(icon, color: colorScheme.primary, size: 24),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: theme.textTheme.bodyLarge?.copyWith(
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      subtitle,
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Icon(Icons.chevron_right, color: colorScheme.onSurfaceVariant),
-            ],
-          ),
+    final textTheme = Theme.of(context).textTheme;
+    return Padding(
+      padding: const EdgeInsets.only(left: 4),
+      child: Text(
+        label,
+        style: textTheme.bodyMedium?.copyWith(
+          fontWeight: FontWeight.w600,
+          letterSpacing: 0.8,
         ),
       ),
     );
   }
 }
 
-/// Info tile widget for read-only settings
-class _InfoTile extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final String subtitle;
+// ── Settings Card ─────────────────────────────────────────────────────────────
 
-  const _InfoTile({
+class _SettingsCard extends StatelessWidget {
+  final List<Widget> children;
+
+  const _SettingsCard({required this.children});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(14),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withAlpha(10),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Column(mainAxisSize: MainAxisSize.min, children: children),
+    );
+  }
+}
+
+// ── Divider ───────────────────────────────────────────────────────────────────
+
+class _CardDivider extends StatelessWidget {
+  const _CardDivider();
+
+  @override
+  Widget build(BuildContext context) {
+    return Divider(
+      height: 1,
+      thickness: 1,
+      indent: 56,
+      endIndent: 0,
+      color: Theme.of(context).colorScheme.outlineVariant.withAlpha(80),
+    );
+  }
+}
+
+// ── Icon Container ────────────────────────────────────────────────────────────
+
+class _IconContainer extends StatelessWidget {
+  final IconData icon;
+  final Color color;
+
+  const _IconContainer({required this.icon, required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 34,
+      height: 34,
+      decoration: BoxDecoration(
+        color: color.withAlpha(26),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Icon(icon, color: color, size: 18),
+    );
+  }
+}
+
+// ── Switch Row ────────────────────────────────────────────────────────────────
+
+class _SwitchRow extends StatelessWidget {
+  final IconData icon;
+  final Color iconColor;
+  final String label;
+  final bool value;
+  final ValueChanged<bool> onChanged;
+
+  const _SwitchRow({
     required this.icon,
-    required this.title,
-    required this.subtitle,
+    required this.iconColor,
+    required this.label,
+    required this.value,
+    required this.onChanged,
   });
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-
-    return Container(
-      decoration: BoxDecoration(
-        color: colorScheme.surfaceContainer,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: colorScheme.outlineVariant, width: 1),
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       child: Row(
         children: [
-          Icon(icon, color: colorScheme.primary, size: 24),
-          const SizedBox(width: 16),
+          _IconContainer(icon: icon, color: iconColor),
+          const SizedBox(width: 14),
           Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: theme.textTheme.bodyLarge?.copyWith(
-                    fontWeight: FontWeight.w500,
-                  ),
+            child: Text(
+              label,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: Theme.of(context).colorScheme.onSurface,
+                fontWeight: FontWeight.w500,
+                fontSize: 15,
+              ),
+            ),
+          ),
+          Switch(
+            value: value,
+            onChanged: onChanged,
+            activeThumbColor: Theme.of(context).colorScheme.primary,
+            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Navigation Row ────────────────────────────────────────────────────────────
+
+class _NavigationRow extends StatelessWidget {
+  final IconData icon;
+  final Color iconColor;
+  final String label;
+  final String? value;
+  final VoidCallback onTap;
+
+  const _NavigationRow({
+    required this.icon,
+    required this.iconColor,
+    required this.label,
+    this.value,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        child: Row(
+          children: [
+            _IconContainer(icon: icon, color: iconColor),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Text(
+                label,
+                style: textTheme.bodyMedium?.copyWith(
+                  color: colorScheme.onSurface,
+                  fontWeight: FontWeight.w500,
+                  fontSize: 15,
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  subtitle,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                  ),
-                ),
-              ],
+              ),
+            ),
+            if (value != null) ...[
+              Text(value ?? '', style: textTheme.bodyMedium),
+              const SizedBox(width: 4),
+            ],
+            Icon(
+              Icons.chevron_right,
+              size: 20,
+              color: textTheme.bodyMedium?.color,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ── Info Row ──────────────────────────────────────────────────────────────────
+
+class _InfoRow extends StatelessWidget {
+  final IconData icon;
+  final Color iconColor;
+  final String label;
+  final String value;
+
+  const _InfoRow({
+    required this.icon,
+    required this.iconColor,
+    required this.label,
+    required this.value,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      child: Row(
+        children: [
+          _IconContainer(icon: icon, color: iconColor),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Text(
+              label,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: colorScheme.onSurface,
+                fontWeight: FontWeight.w500,
+                fontSize: 15,
+              ),
+            ),
+          ),
+          Text(
+            value,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: colorScheme.onSurfaceVariant,
+              fontSize: 14,
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+// ── Temperature Row ───────────────────────────────────────────────────────────
+
+class _TemperatureRow extends StatelessWidget {
+  final SettingsController controller;
+
+  const _TemperatureRow({required this.controller});
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      child: Row(
+        children: [
+          const _IconContainer(
+            icon: Icons.thermostat_outlined,
+            color: Color(0xFF5B8DEF),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Text(
+              'Temperature',
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: colorScheme.onSurface,
+                fontWeight: FontWeight.w500,
+                fontSize: 15,
+              ),
+            ),
+          ),
+          _TempToggle(controller: controller),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Temp Toggle ───────────────────────────────────────────────────────────────
+
+class _TempToggle extends StatelessWidget {
+  final SettingsController controller;
+
+  const _TempToggle({required this.controller});
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final selectedColor = colorScheme.primary;
+    final unselectedColor = colorScheme.onSurfaceVariant;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceContainerHighest,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Obx(() {
+        final isCelsius = controller.temperatureUnit == TemperatureUnit.celsius;
+        return Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _TempOption(
+              label: '°C',
+              selected: isCelsius,
+              selectedColor: selectedColor,
+              unselectedColor: unselectedColor,
+              onTap: () => controller.temperatureUnit = TemperatureUnit.celsius,
+            ),
+            _TempOption(
+              label: '°F',
+              selected: !isCelsius,
+              selectedColor: selectedColor,
+              unselectedColor: unselectedColor,
+              onTap: () =>
+                  controller.temperatureUnit = TemperatureUnit.fahrenheit,
+            ),
+          ],
+        );
+      }),
+    );
+  }
+}
+
+class _TempOption extends StatelessWidget {
+  final String label;
+  final bool selected;
+  final Color selectedColor;
+  final Color unselectedColor;
+  final VoidCallback onTap;
+
+  const _TempOption({
+    required this.label,
+    required this.selected,
+    required this.selectedColor,
+    required this.unselectedColor,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+        decoration: BoxDecoration(
+          color: selected ? colorScheme.surface : Colors.transparent,
+          borderRadius: BorderRadius.circular(7),
+        ),
+        child: AnimatedDefaultTextStyle(
+          duration: const Duration(milliseconds: 200),
+          style: Theme.of(context).textTheme.labelMedium!.copyWith(
+            color: selected ? selectedColor : unselectedColor,
+            fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+            fontSize: 14,
+          ),
+          child: Text(label),
+        ),
       ),
     );
   }

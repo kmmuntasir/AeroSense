@@ -6,6 +6,10 @@ class AppTheme {
   static const Color secondaryColor = Color(0xFF26C6DA);
   static const Color accentColor = Color(0xFFFF7043);
 
+  // Button colors
+  static const Color buttonPrimary = Color(0xFF2B3BEE);
+  static const Color buttonBackground = Color(0xFFCBD5E1);
+
   // Background colors
   static const Color lightBackground = Color(0xFFF5F5F5);
   static const Color darkBackground = Color(0xFF121212);
@@ -16,6 +20,18 @@ class AppTheme {
   static const Color darkTextPrimary = Color(0xFFFFFFFF);
   static const Color darkTextSecondary = Color(0xFFB0B0B0);
 
+  static const Color lightHintText = Color(0xFF64748B);
+  static const Color lightSurface = Color(0xFFF1F5F9);
+
+  static const Color darkHintText = Color(0xFF64748B);
+  static const Color darkSurface = Color(0xFF1E1E1E);
+
+  static const Color selectedColor = Color(0xFF42A5F5);
+  static const Color unselectedColor = Color(0xFF64748B);
+
+  static const Color selectedColorDark = Color(0xFF42A5F5);
+  static const Color unselectedColorDark = Color(0xFF64748B);
+
   // Light theme
   static ThemeData get lightTheme {
     return ThemeData(
@@ -24,7 +40,7 @@ class AppTheme {
       primaryColor: primaryColor,
       scaffoldBackgroundColor: lightBackground,
       colorScheme: const ColorScheme.light(
-        primary: primaryColor,
+        primary: buttonPrimary,
         secondary: secondaryColor,
         tertiary: accentColor,
         surface: Colors.white,
@@ -33,21 +49,36 @@ class AppTheme {
         onSecondary: Colors.white,
         onSurface: lightTextPrimary,
         onError: Colors.white,
+        surfaceContainer: lightSurface,
+        surfaceContainerHighest: buttonBackground,
       ),
       appBarTheme: const AppBarTheme(
         elevation: 0,
         centerTitle: true,
-        backgroundColor: primaryColor,
-        foregroundColor: Colors.white,
+        backgroundColor: lightBackground,
+        foregroundColor: lightTextPrimary,
+        surfaceTintColor: lightBackground,
+        titleTextStyle: TextStyle(
+          color: lightTextPrimary,
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
+        ),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: primaryColor,
+          backgroundColor: buttonPrimary,
           foregroundColor: Colors.white,
           elevation: 2,
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
+      ),
+      switchTheme: SwitchThemeData(
+        trackOutlineColor: WidgetStateProperty.all(Colors.transparent),
+        thumbColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) return Colors.white;
+          return Colors.white;
+        }),
       ),
       cardTheme: CardThemeData(
         elevation: 2,
@@ -81,7 +112,7 @@ class AppTheme {
           color: lightTextPrimary,
         ),
         bodyLarge: TextStyle(fontSize: 16, color: lightTextPrimary),
-        bodyMedium: TextStyle(fontSize: 14, color: lightTextSecondary),
+        bodyMedium: TextStyle(fontSize: 14, color: lightHintText),
       ),
     );
   }
@@ -107,7 +138,7 @@ class AppTheme {
       appBarTheme: const AppBarTheme(
         elevation: 0,
         centerTitle: true,
-        backgroundColor: Color(0xFF1E1E1E),
+        backgroundColor: Color.fromARGB(255, 13, 11, 11),
         foregroundColor: darkTextPrimary,
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
