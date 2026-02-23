@@ -168,7 +168,9 @@ class _HeroCard extends StatelessWidget {
                   child: Center(
                     child: Text(
                       controller.weatherEmoji,
-                      style: const TextStyle(fontSize: 36),
+                      style: const TextStyle(
+                        fontSize: AppConstants.weatherEmojiSize,
+                      ),
                     ),
                   ),
                 ),

@@ -44,6 +44,16 @@ class AppTheme {
   // Error family
   static const Color errorDark = Color(0xFF991B1B);
 
+  // Icon accent colors (settings page icon backgrounds)
+  static const Color iconBlue = Color(0xFF5B8DEF);
+  static const Color iconLightBlue = Color(0xFF4FC3F7);
+  static const Color iconIndigo = Color(0xFF7986CB);
+  static const Color iconRed = Color(0xFFEF5350);
+  static const Color iconOrange = Color(0xFFFFA726);
+  static const Color iconTeal = Color(0xFF26A69A);
+  static const Color iconPurple = Color(0xFFAB47BC);
+  static const Color iconGrey = Color(0xFF78909C);
+
   // Light theme
   static ThemeData get lightTheme {
     return ThemeData(

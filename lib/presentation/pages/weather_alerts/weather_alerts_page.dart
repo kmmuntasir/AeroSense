@@ -78,7 +78,7 @@ class _ActiveWarningCard extends StatelessWidget {
             Text(
               controller.alertDescription,
               style: tt.bodyMedium?.copyWith(
-                color: const Color(0xff475569),
+                color: cs.onSurfaceVariant,
                 height: 1.5,
               ),
             ),
@@ -136,7 +136,7 @@ class _AlertHeader extends StatelessWidget {
                 letterSpacing: 0.5,
               ),
             ),
-            Text('Severe Thunderstorm', style: tt.titleMedium),
+            Text(controller.alertTitle, style: tt.titleMedium),
           ],
         ),
         const Spacer(),

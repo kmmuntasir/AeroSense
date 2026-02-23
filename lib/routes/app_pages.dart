@@ -14,7 +14,7 @@ import '../core/bindings/location_binding.dart';
 import '../core/bindings/settings_binding.dart';
 
 class AppPages {
-  static const initial = '/weather-alerts';
+  static const initial = '/onboarding';
 
   static final routes = [
     // Weather Alerts - standalone for development/testing

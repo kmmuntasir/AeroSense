@@ -1,5 +1,7 @@
+import 'package:aero_sense/core/constants/app_constants.dart';
 import 'package:aero_sense/core/controllers/settings_controller.dart';
 import 'package:aero_sense/core/models/temperature_unit.dart';
+import 'package:aero_sense/core/themes/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -8,8 +10,16 @@ class SettingsPage extends GetView<SettingsController> {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
     return Scaffold(
-      appBar: AppBar(title: Text('Settings')),
+      backgroundColor: cs.surfaceContainer,
+      appBar: AppBar(
+        scrolledUnderElevation: 0,
+        centerTitle: false,
+        backgroundColor: cs.surfaceContainer,
+        title: const Text('Settings'),
+      ),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
@@ -23,7 +33,7 @@ class SettingsPage extends GetView<SettingsController> {
                 const _CardDivider(),
                 _NavigationRow(
                   icon: Icons.air,
-                  iconColor: const Color(0xFF5B8DEF),
+                  iconColor: AppTheme.iconBlue,
                   label: 'Wind Speed',
                   value: 'km/h',
                   onTap: () {},
@@ -31,7 +41,7 @@ class SettingsPage extends GetView<SettingsController> {
                 const _CardDivider(),
                 _NavigationRow(
                   icon: Icons.water_drop_outlined,
-                  iconColor: const Color(0xFF4FC3F7),
+                  iconColor: AppTheme.iconLightBlue,
                   label: 'Precipitation',
                   value: 'mm',
                   onTap: () {},
@@ -48,7 +58,7 @@ class SettingsPage extends GetView<SettingsController> {
                 Obx(
                   () => _SwitchRow(
                     icon: Icons.nightlight_round,
-                    iconColor: const Color(0xFF7986CB),
+                    iconColor: AppTheme.iconIndigo,
                     label: 'Dark Mode',
                     value: controller.isDarkMode,
                     onChanged: (v) => controller.isDarkMode = v,
@@ -58,7 +68,7 @@ class SettingsPage extends GetView<SettingsController> {
                 Obx(
                   () => _SwitchRow(
                     icon: Icons.settings_display_outlined,
-                    iconColor: const Color(0xFF42A5F5),
+                    iconColor: AppTheme.primaryColor,
                     label: 'Use System Setting',
                     value: controller.locationServicesEnabled,
                     onChanged: (v) => controller.locationServicesEnabled = v,
@@ -76,7 +86,7 @@ class SettingsPage extends GetView<SettingsController> {
                 Obx(
                   () => _SwitchRow(
                     icon: Icons.warning_amber_rounded,
-                    iconColor: const Color(0xFFEF5350),
+                    iconColor: AppTheme.iconRed,
                     label: 'Severe Weather',
                     value: controller.notificationsEnabled,
                     onChanged: (v) => controller.notificationsEnabled = v,
@@ -86,7 +96,7 @@ class SettingsPage extends GetView<SettingsController> {
                 Obx(
                   () => _SwitchRow(
                     icon: Icons.wb_sunny_outlined,
-                    iconColor: const Color(0xFFFFA726),
+                    iconColor: AppTheme.iconOrange,
                     label: 'Morning Summary',
                     value: controller.flightWarningsEnabled,
                     onChanged: (v) => controller.flightWarningsEnabled = v,
@@ -103,21 +113,21 @@ class SettingsPage extends GetView<SettingsController> {
               children: [
                 _NavigationRow(
                   icon: Icons.help_outline_rounded,
-                  iconColor: const Color(0xFF26A69A),
+                  iconColor: AppTheme.iconTeal,
                   label: 'Help Center',
                   onTap: () {},
                 ),
                 const _CardDivider(),
                 _NavigationRow(
                   icon: Icons.lock_outline_rounded,
-                  iconColor: const Color(0xFFAB47BC),
+                  iconColor: AppTheme.iconPurple,
                   label: 'Privacy Policy',
                   onTap: () {},
                 ),
                 const _CardDivider(),
                 const _InfoRow(
                   icon: Icons.info_outline_rounded,
-                  iconColor: Color(0xFF78909C),
+                  iconColor: AppTheme.iconGrey,
                   label: 'App Version',
                   value: 'v2.4.1',
                 ),
@@ -130,7 +140,9 @@ class SettingsPage extends GetView<SettingsController> {
               children: [
                 InkWell(
                   onTap: () => _showLogOutDialog(context),
-                  borderRadius: BorderRadius.circular(14),
+                  borderRadius: BorderRadius.circular(
+                    AppConstants.settingsCardRadius,
+                  ),
                   child: Padding(
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     child: Center(
@@ -182,12 +194,11 @@ class _SectionLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
     return Padding(
       padding: const EdgeInsets.only(left: 4),
       child: Text(
         label,
-        style: textTheme.bodyMedium?.copyWith(
+        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
           fontWeight: FontWeight.w600,
           letterSpacing: 0.8,
         ),
@@ -205,13 +216,15 @@ class _SettingsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
     return Container(
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(14),
+        color: cs.surface,
+        borderRadius: BorderRadius.circular(AppConstants.settingsCardRadius),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withAlpha(10),
+            color: cs.shadow.withAlpha(10),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -255,7 +268,7 @@ class _IconContainer extends StatelessWidget {
       height: 34,
       decoration: BoxDecoration(
         color: color.withAlpha(26),
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(AppConstants.iconContainerRadius),
       ),
       child: Icon(icon, color: color, size: 18),
     );
@@ -281,6 +294,8 @@ class _SwitchRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       child: Row(
@@ -291,16 +306,16 @@ class _SwitchRow extends StatelessWidget {
             child: Text(
               label,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Theme.of(context).colorScheme.onSurface,
+                color: cs.onSurface,
                 fontWeight: FontWeight.w500,
-                fontSize: 15,
+                fontSize: AppConstants.settingsRowFontSize,
               ),
             ),
           ),
           Switch(
             value: value,
             onChanged: onChanged,
-            activeThumbColor: Theme.of(context).colorScheme.primary,
+            activeThumbColor: cs.primary,
             materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
           ),
         ],
@@ -328,8 +343,8 @@ class _NavigationRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
+    final cs = Theme.of(context).colorScheme;
+    final tt = Theme.of(context).textTheme;
 
     return InkWell(
       onTap: onTap,
@@ -342,22 +357,18 @@ class _NavigationRow extends StatelessWidget {
             Expanded(
               child: Text(
                 label,
-                style: textTheme.bodyMedium?.copyWith(
-                  color: colorScheme.onSurface,
+                style: tt.bodyMedium?.copyWith(
+                  color: cs.onSurface,
                   fontWeight: FontWeight.w500,
-                  fontSize: 15,
+                  fontSize: AppConstants.settingsRowFontSize,
                 ),
               ),
             ),
             if (value != null) ...[
-              Text(value ?? '', style: textTheme.bodyMedium),
+              Text(value ?? '', style: tt.bodyMedium),
               const SizedBox(width: 4),
             ],
-            Icon(
-              Icons.chevron_right,
-              size: 20,
-              color: textTheme.bodyMedium?.color,
-            ),
+            Icon(Icons.chevron_right, size: 20, color: tt.bodyMedium?.color),
           ],
         ),
       ),
@@ -382,7 +393,8 @@ class _InfoRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
+    final cs = Theme.of(context).colorScheme;
+    final tt = Theme.of(context).textTheme;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
@@ -393,18 +405,18 @@ class _InfoRow extends StatelessWidget {
           Expanded(
             child: Text(
               label,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: colorScheme.onSurface,
+              style: tt.bodyMedium?.copyWith(
+                color: cs.onSurface,
                 fontWeight: FontWeight.w500,
-                fontSize: 15,
+                fontSize: AppConstants.settingsRowFontSize,
               ),
             ),
           ),
           Text(
             value,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: colorScheme.onSurfaceVariant,
-              fontSize: 14,
+            style: tt.bodySmall?.copyWith(
+              color: cs.onSurfaceVariant,
+              fontSize: AppConstants.settingsValueFontSize,
             ),
           ),
         ],
@@ -422,7 +434,7 @@ class _TemperatureRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
+    final cs = Theme.of(context).colorScheme;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
@@ -430,16 +442,16 @@ class _TemperatureRow extends StatelessWidget {
         children: [
           const _IconContainer(
             icon: Icons.thermostat_outlined,
-            color: Color(0xFF5B8DEF),
+            color: AppTheme.iconBlue,
           ),
           const SizedBox(width: 14),
           Expanded(
             child: Text(
               'Temperature',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: colorScheme.onSurface,
+                color: cs.onSurface,
                 fontWeight: FontWeight.w500,
-                fontSize: 15,
+                fontSize: AppConstants.settingsRowFontSize,
               ),
             ),
           ),
@@ -459,15 +471,13 @@ class _TempToggle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final selectedColor = colorScheme.primary;
-    final unselectedColor = colorScheme.onSurfaceVariant;
+    final cs = Theme.of(context).colorScheme;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
       decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(10),
+        color: cs.surfaceContainerHighest,
+        borderRadius: BorderRadius.circular(AppConstants.tempToggleRadius),
       ),
       child: Obx(() {
         final isCelsius = controller.temperatureUnit == TemperatureUnit.celsius;
@@ -477,15 +487,15 @@ class _TempToggle extends StatelessWidget {
             _TempOption(
               label: '°C',
               selected: isCelsius,
-              selectedColor: selectedColor,
-              unselectedColor: unselectedColor,
+              selectedColor: cs.primary,
+              unselectedColor: cs.onSurfaceVariant,
               onTap: () => controller.temperatureUnit = TemperatureUnit.celsius,
             ),
             _TempOption(
               label: '°F',
               selected: !isCelsius,
-              selectedColor: selectedColor,
-              unselectedColor: unselectedColor,
+              selectedColor: cs.primary,
+              unselectedColor: cs.onSurfaceVariant,
               onTap: () =>
                   controller.temperatureUnit = TemperatureUnit.fahrenheit,
             ),
@@ -513,22 +523,22 @@ class _TempOption extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
+    final cs = Theme.of(context).colorScheme;
 
     return GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
         decoration: BoxDecoration(
-          color: selected ? colorScheme.surface : Colors.transparent,
-          borderRadius: BorderRadius.circular(7),
+          color: selected ? cs.surface : Colors.transparent,
+          borderRadius: BorderRadius.circular(AppConstants.tempOptionRadius),
         ),
         child: AnimatedDefaultTextStyle(
           duration: const Duration(milliseconds: 200),
           style: Theme.of(context).textTheme.labelMedium!.copyWith(
             color: selected ? selectedColor : unselectedColor,
             fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
-            fontSize: 14,
+            fontSize: AppConstants.settingsValueFontSize,
           ),
           child: Text(label),
         ),
