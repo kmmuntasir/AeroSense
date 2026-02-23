@@ -1,0 +1,42 @@
+{
+  "mcpServers": {
+    "github": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-github",
+        "--github-personal-access-token",
+        "${GITHUB_TOKEN}"
+      ]
+    },
+    "figma": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@yhy2001/figma-mcp-server",
+        "--stdio"
+      ],
+      "env": {
+        "FIGMA_API_KEY": "${FIGMA_TOKEN}"
+      }
+    },
+    "trello": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@delorenj/mcp-server-trello"
+      ],
+      "env": {
+        "TRELLO_API_KEY": "${TRELLO_API_KEY}",
+        "TRELLO_TOKEN": "${TRELLO_TOKEN}"
+      }
+    },
+    "context7": {
+      "type": "http",
+      "url": "https://mcp.context7.com/mcp"
+    }
+  }
+}
