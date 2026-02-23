@@ -28,7 +28,8 @@ class WeatherProvider {
         'longitude': longitude.toString(),
         'current': variables?.join(',') ?? '',
         'hourly': variables?.join(',') ?? '',
-        'daily': 'temperature_2m_max,temperature_2m_min,precipitation_sum,weather_code,sunrise,sunset',
+        'daily':
+            'temperature_2m_max,temperature_2m_min,precipitation_sum,weather_code,sunrise,sunset',
         'timezone': timezone ?? 'auto',
         'forecast_days': '7',
         'windspeed_unit': 'ms',
@@ -40,7 +41,10 @@ class WeatherProvider {
         queryParameters['elevation'] = elevation.toString();
       }
 
-      final response = await _apiClient.get(_weatherPath, queryParameters: queryParameters);
+      final response = await _apiClient.get(
+        _weatherPath,
+        queryParameters: queryParameters,
+      );
       final data = response.data;
 
       if (data == null) {
@@ -88,7 +92,9 @@ class WeatherProvider {
       if (e is ApiException) {
         rethrow;
       }
-      throw ApiException('Failed to fetch weather by location name: ${e.toString()}');
+      throw ApiException(
+        'Failed to fetch weather by location name: ${e.toString()}',
+      );
     }
   }
 
@@ -146,7 +152,7 @@ class WeatherProvider {
       }
 
       // if (failedLocations.isNotEmpty) {
-        //   print('Failed to fetch weather for: ${failedLocations.join(', ')}');
+      //   print('Failed to fetch weather for: ${failedLocations.join(', ')}');
       // }
 
       return results;
@@ -154,7 +160,9 @@ class WeatherProvider {
       if (e is ApiException) {
         rethrow;
       }
-      throw ApiException('Failed to fetch multiple weather locations: ${e.toString()}');
+      throw ApiException(
+        'Failed to fetch multiple weather locations: ${e.toString()}',
+      );
     }
   }
 

@@ -2,7 +2,9 @@ import 'package:get/get.dart';
 import '../presentation/pages/onboarding/onboarding_page.dart';
 import '../presentation/pages/search/search_page.dart';
 import '../presentation/pages/dashboard/dashboard_page.dart';
+import '../presentation/pages/shell/main_shell_page.dart';
 import '../presentation/bindings/onboarding_binding.dart';
+import '../presentation/bindings/main_shell_binding.dart';
 import '../core/bindings/location_binding.dart';
 
 class AppPages {
@@ -24,6 +26,15 @@ class AppPages {
       page: () => const SearchPage(),
       binding: LocationBinding(),
       transition: Transition.cupertino,
+    ),
+
+    // Main shell - wraps dashboard and settings with bottom nav
+    GetPage(
+      name: '/main',
+      page: () => const MainShellPage(),
+      binding: MainShellBinding(),
+      transition: Transition.fadeIn,
+      transitionDuration: const Duration(milliseconds: 300),
     ),
 
     // Dashboard - main weather view

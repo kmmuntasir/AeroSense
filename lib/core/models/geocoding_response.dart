@@ -11,9 +11,10 @@ class GeocodingResponse {
 
   factory GeocodingResponse.fromJson(Map<String, dynamic> json) {
     return GeocodingResponse(
-      results: (json['results'] as List?)
-          ?.map((e) => GeocodingResult.fromJson(e))
-          .toList() ??
+      results:
+          (json['results'] as List?)
+              ?.map((e) => GeocodingResult.fromJson(e))
+              .toList() ??
           [],
       generationtimeMs: (json['generationtime_ms'] as num?)?.toDouble(),
       resultsCount: json['results_count'] as int?,

@@ -32,7 +32,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
       // Permission already granted, get location and go to dashboard
       final success = await _locationController.getCurrentLocation();
       if (success && mounted) {
-        Get.offAllNamed('/dashboard');
+        Get.offAllNamed('/main');
       } else if (mounted) {
         Get.offAllNamed('/search');
       }
@@ -43,7 +43,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
         // Get location and proceed to dashboard
         final success = await _locationController.getCurrentLocation();
         if (success && mounted) {
-          Get.offAllNamed('/dashboard');
+          Get.offAllNamed('/main');
         } else if (mounted) {
           Get.offAllNamed('/search');
         }
@@ -60,7 +60,9 @@ class _OnboardingPageState extends State<OnboardingPage> {
     final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF121212) : const Color(0xFFF8F9FA),
+      backgroundColor: isDark
+          ? const Color(0xFF121212)
+          : const Color(0xFFF8F9FA),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -73,11 +75,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                 color: const Color(0xFF4A90E2),
                 borderRadius: BorderRadius.circular(24),
               ),
-              child: const Icon(
-                Icons.cloud,
-                size: 64,
-                color: Colors.white,
-              ),
+              child: const Icon(Icons.cloud, size: 64, color: Colors.white),
             ),
             const SizedBox(height: 32),
             Text(

@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:aero_sense/core/controllers/weather_controller.dart';
@@ -8,7 +9,9 @@ class SettingsController extends GetxController {
 
   // Reactive variables
   final RxBool _isDarkMode = RxBool(false);
-  final Rx<TemperatureUnit> _temperatureUnit = Rx<TemperatureUnit>(TemperatureUnit.celsius);
+  final Rx<TemperatureUnit> _temperatureUnit = Rx<TemperatureUnit>(
+    TemperatureUnit.celsius,
+  );
   final RxBool _notificationsEnabled = RxBool(true);
   final RxBool _locationServicesEnabled = RxBool(true);
   final RxBool _autoRefreshEnabled = RxBool(true);
@@ -32,6 +35,7 @@ class SettingsController extends GetxController {
   set isDarkMode(bool value) {
     _isDarkMode.value = value;
     _storage.write('dark_mode', value);
+    Get.changeThemeMode(value ? ThemeMode.dark : ThemeMode.light);
   }
 
   set temperatureUnit(TemperatureUnit value) {
@@ -91,6 +95,7 @@ class SettingsController extends GetxController {
       // Load theme preference
       final darkMode = _storage.read('dark_mode') ?? false;
       _isDarkMode.value = darkMode;
+      Get.changeThemeMode(darkMode ? ThemeMode.dark : ThemeMode.light);
 
       // Load temperature unit
       final tempUnit = _storage.read('temperature_unit');
@@ -102,14 +107,16 @@ class SettingsController extends GetxController {
       }
 
       // Load notification settings
-      _notificationsEnabled.value = _storage.read('notifications_enabled') ?? true;
-      _locationServicesEnabled.value = _storage.read('location_services_enabled') ?? true;
+      _notificationsEnabled.value =
+          _storage.read('notifications_enabled') ?? true;
+      _locationServicesEnabled.value =
+          _storage.read('location_services_enabled') ?? true;
       _autoRefreshEnabled.value = _storage.read('auto_refresh_enabled') ?? true;
       _autoRefreshInterval.value = _storage.read('auto_refresh_interval') ?? 30;
       _dataRetentionDays.value = _storage.read('data_retention_days') ?? 30;
       _appLanguage.value = _storage.read('app_language') ?? 'en';
-      _flightWarningsEnabled.value = _storage.read('flight_warnings_enabled') ?? true;
-
+      _flightWarningsEnabled.value =
+          _storage.read('flight_warnings_enabled') ?? true;
     } catch (e) {
       // Handle error loading settings - silently fail with defaults
     }
@@ -123,6 +130,7 @@ class SettingsController extends GetxController {
 
       // Reset to default values
       _isDarkMode.value = false;
+      Get.changeThemeMode(ThemeMode.light);
       _temperatureUnit.value = TemperatureUnit.celsius;
       _notificationsEnabled.value = true;
       _locationServicesEnabled.value = true;
@@ -200,7 +208,6 @@ class SettingsController extends GetxController {
         // In a real app, you'd filter by last accessed time
         _storage.remove('saved_locations');
       }
-
     } catch (e) {
       throw Exception('Failed to clear cached data: ${e.toString()}');
     }
@@ -219,7 +226,8 @@ class SettingsController extends GetxController {
     }
 
     // Language should be a valid ISO code
-    if (appLanguage.length != 2 || !RegExp(r'^[a-z]{2}$').hasMatch(appLanguage)) {
+    if (appLanguage.length != 2 ||
+        !RegExp(r'^[a-z]{2}$').hasMatch(appLanguage)) {
       return false;
     }
 
@@ -230,7 +238,9 @@ class SettingsController extends GetxController {
   Map<String, dynamic> getSettingsSummary() {
     return {
       'theme': isDarkMode ? 'Dark' : 'Light',
-      'temperature_unit': temperatureUnit == TemperatureUnit.celsius ? 'Celsius' : 'Fahrenheit',
+      'temperature_unit': temperatureUnit == TemperatureUnit.celsius
+          ? 'Celsius'
+          : 'Fahrenheit',
       'notifications': notificationsEnabled ? 'Enabled' : 'Disabled',
       'location_services': locationServicesEnabled ? 'Enabled' : 'Disabled',
       'auto_refresh': autoRefreshEnabled ? 'Enabled' : 'Disabled',
