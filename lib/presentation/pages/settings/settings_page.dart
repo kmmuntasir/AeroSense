@@ -30,22 +30,6 @@ class SettingsPage extends GetView<SettingsController> {
             _SettingsCard(
               children: [
                 _TemperatureRow(controller: controller),
-                const _CardDivider(),
-                _NavigationRow(
-                  icon: Icons.air,
-                  iconColor: AppTheme.iconBlue,
-                  label: 'Wind Speed',
-                  value: 'km/h',
-                  onTap: () {},
-                ),
-                const _CardDivider(),
-                _NavigationRow(
-                  icon: Icons.water_drop_outlined,
-                  iconColor: AppTheme.iconLightBlue,
-                  label: 'Precipitation',
-                  value: 'mm',
-                  onTap: () {},
-                ),
               ],
             ),
             const SizedBox(height: 24),
@@ -67,9 +51,9 @@ class SettingsPage extends GetView<SettingsController> {
                 const _CardDivider(),
                 Obx(
                   () => _SwitchRow(
-                    icon: Icons.settings_display_outlined,
+                    icon: Icons.location_on_outlined,
                     iconColor: AppTheme.primaryColor,
-                    label: 'Use System Setting',
+                    label: 'Location Services',
                     value: controller.locationServicesEnabled,
                     onChanged: (v) => controller.locationServicesEnabled = v,
                   ),
@@ -173,7 +157,10 @@ class SettingsPage extends GetView<SettingsController> {
         actions: [
           TextButton(onPressed: () => Get.back(), child: const Text('Cancel')),
           TextButton(
-            onPressed: () => Get.back(),
+            onPressed: () {
+              Get.back();
+              controller.logout();
+            },
             child: Text(
               'Log Out',
               style: TextStyle(color: Theme.of(context).colorScheme.error),
@@ -330,14 +317,12 @@ class _NavigationRow extends StatelessWidget {
   final IconData icon;
   final Color iconColor;
   final String label;
-  final String? value;
   final VoidCallback onTap;
 
   const _NavigationRow({
     required this.icon,
     required this.iconColor,
     required this.label,
-    this.value,
     required this.onTap,
   });
 
@@ -364,10 +349,6 @@ class _NavigationRow extends StatelessWidget {
                 ),
               ),
             ),
-            if (value != null) ...[
-              Text(value ?? '', style: tt.bodyMedium),
-              const SizedBox(width: 4),
-            ],
             Icon(Icons.chevron_right, size: 20, color: tt.bodyMedium?.color),
           ],
         ),

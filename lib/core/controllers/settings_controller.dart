@@ -261,6 +261,12 @@ class SettingsController extends GetxController {
     autoRefreshEnabled = !autoRefreshEnabled;
   }
 
+  /// Logout and reset settings
+  void logout() {
+    resetToDefaults();
+    Get.offAllNamed('/onboarding');
+  }
+
   /// Get system information for debugging
   Map<String, dynamic> getSystemInfo() {
     return {
