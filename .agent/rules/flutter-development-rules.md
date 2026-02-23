@@ -170,6 +170,20 @@ Use `SnackBar` or `AlertDialog` for user-facing errors.
 - `cached_network_image` - Image caching
 - `logger` - Better logging
 - `url_launcher` - Open URLs/make calls
+- `ffmpeg_kit_flutter_new` - Image processing and conversion
+
+## Asset Management
+
+### Icons & Images
+- **Directory**: If `assets/` or its subfolders (`icons`, `images`) are missing, create them. Always use existing ones if available.
+- **Format**: Prefer **SVG** for icons/illustrations. Use **PNG** for complex imagery.
+- **Naming**: Use `snake_case` with prefixes: `ic_` for icons, `img_` for images.
+- **Handling**: Use format-agnostic widgets (e.g., `CommonIcon`) to handle `.svg` and `.png` dynamically.
+- **Theming**: Always apply colors via `colorFilter` (SVG) or `color` (PNG/Icon) using `Theme.of(context).colorScheme`.
+
+### Conversion
+- For dev-time conversion, use `ffmpeg` if available or the `ffmpeg_kit_flutter_new` package.
+- Avoid large conversion packages in production unless necessary for features.
 
 ## Repository Pattern
 
