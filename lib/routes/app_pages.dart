@@ -4,15 +4,27 @@ import '../presentation/pages/search/search_page.dart';
 import '../presentation/pages/dashboard/dashboard_page.dart';
 import '../presentation/pages/settings/settings_page.dart';
 import '../presentation/pages/shell/main_shell_page.dart';
+import '../presentation/pages/forecast_details/forecast_details_page.dart';
+import '../presentation/controllers/forecast_details_controller.dart';
 import '../presentation/bindings/onboarding_binding.dart';
 import '../presentation/bindings/main_shell_binding.dart';
 import '../core/bindings/location_binding.dart';
 import '../core/bindings/settings_binding.dart';
 
 class AppPages {
-  static const initial = '/settings';
+  static const initial = '/forecast-details';
 
   static final routes = [
+    // Forecast Details - standalone for development/testing
+    GetPage(
+      name: '/forecast-details',
+      page: () => const ForecastDetailsPage(),
+      binding: BindingsBuilder(
+        () => Get.lazyPut(() => ForecastDetailsController()),
+      ),
+      transition: Transition.cupertino,
+    ),
+
     // Settings - standalone settings page (for testing)
     GetPage(
       name: '/settings',

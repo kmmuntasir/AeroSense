@@ -32,6 +32,11 @@ class AppTheme {
   static const Color selectedColorDark = Color(0xFF42A5F5);
   static const Color unselectedColorDark = Color(0xFF64748B);
 
+  // UV Index scale colors (semantic, not theme-mode dependent)
+  static const Color uvLow = Color(0xFF4CAF50);
+  static const Color uvModerate = Color(0xFFFFC107);
+  static const Color uvHigh = Color(0xFFFF5722);
+
   // Light theme
   static ThemeData get lightTheme {
     return ThemeData(
@@ -49,8 +54,10 @@ class AppTheme {
         onSecondary: Colors.white,
         onSurface: lightTextPrimary,
         onError: Colors.white,
-        surfaceContainer: lightSurface,
+        surfaceContainer: Color(0xFFF0F4FF),
         surfaceContainerHighest: buttonBackground,
+        primaryContainer: Color(0xFFEEF2FF),
+        tertiaryContainer: Color(0xFFFFF8E8),
       ),
       appBarTheme: const AppBarTheme(
         elevation: 0,
