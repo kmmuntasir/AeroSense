@@ -2,15 +2,26 @@ import 'package:get/get.dart';
 import '../presentation/pages/onboarding/onboarding_page.dart';
 import '../presentation/pages/search/search_page.dart';
 import '../presentation/pages/dashboard/dashboard_page.dart';
+import '../presentation/pages/settings/settings_page.dart';
 import '../presentation/pages/shell/main_shell_page.dart';
 import '../presentation/bindings/onboarding_binding.dart';
 import '../presentation/bindings/main_shell_binding.dart';
 import '../core/bindings/location_binding.dart';
+import '../core/bindings/settings_binding.dart';
 
 class AppPages {
-  static const initial = '/onboarding';
+  static const initial = '/settings';
 
   static final routes = [
+    // Settings - standalone settings page (for testing)
+    GetPage(
+      name: '/settings',
+      page: () => const SettingsPage(),
+      binding: SettingsBinding(),
+      transition: Transition.fadeIn,
+      transitionDuration: const Duration(milliseconds: 300),
+    ),
+
     // Onboarding - handles permission check and routing
     GetPage(
       name: '/onboarding',
