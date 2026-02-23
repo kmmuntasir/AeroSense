@@ -1,0 +1,104 @@
+{
+  "name": "figma",
+  "type": "mcp",
+  "server": "https://mcp.figma.com/mcp",
+  "capabilities": {
+    "icons": true,
+    "images": true
+  },
+  "export": [
+    {
+      "path": "assets/icons/",
+      "format": "svg"
+    },
+    {
+      "path": "assets/images/",
+      "format": "png"
+    }
+  ],
+  "fileKey": "nbEaJycmx0bstnYhVfTJ86",
+  "assets": [
+    {
+      "nodeId": "10:159",
+      "fileName": "ic_app_logo.png",
+      "localPath": "assets/images/ic_app_logo.png",
+      "format": "PNG",
+      "dimensions": "110x100",
+      "screen": "Splash",
+      "usage": "App logo lockup"
+    },
+    {
+      "nodeId": "10:176",
+      "imageRef": "74569cc42a98285b70196499c288823f255dc81a",
+      "fileName": "img_location_illustration.png",
+      "localPath": "assets/images/img_location_illustration.png",
+      "format": "PNG",
+      "dimensions": "320x320",
+      "screen": "Onboarding Step 1",
+      "usage": "Location permission illustration (image fill)"
+    },
+    {
+      "nodeId": "10:178",
+      "fileName": "ic_location_deco_top.png",
+      "localPath": "assets/icons/ic_location_deco_top.png",
+      "format": "PNG",
+      "dimensions": "48x48",
+      "screen": "Onboarding Step 1",
+      "usage": "Floating decoration — top-right corner"
+    },
+    {
+      "nodeId": "10:182",
+      "fileName": "ic_location_deco_bottom.png",
+      "localPath": "assets/icons/ic_location_deco_bottom.png",
+      "format": "PNG",
+      "dimensions": "40x40",
+      "screen": "Onboarding Step 1",
+      "usage": "Floating decoration — bottom-left corner"
+    },
+    {
+      "nodeId": "10:214",
+      "fileName": "img_notifications_illustration.png",
+      "localPath": "assets/images/img_notifications_illustration.png",
+      "format": "PNG",
+      "dimensions": "256x256",
+      "screen": "Onboarding Step 2",
+      "usage": "Notification permission illustration"
+    },
+    {
+      "nodeId": "10:258",
+      "fileName": "img_get_started_dashboard.png",
+      "localPath": "assets/images/img_get_started_dashboard.png",
+      "format": "PNG",
+      "dimensions": "308x336",
+      "screen": "Onboarding Step 3",
+      "usage": "Weather dashboard preview image"
+    },
+    {
+      "nodeId": "10:254",
+      "fileName": "ic_get_started_deco_star.svg",
+      "localPath": "assets/icons/ic_get_started_deco_star.svg",
+      "format": "SVG",
+      "dimensions": "55x55",
+      "screen": "Onboarding Step 3",
+      "usage": "Decorative sparkle — top-right corner"
+    },
+    {
+      "nodeId": "10:256",
+      "fileName": "ic_get_started_deco_cloud.svg",
+      "localPath": "assets/icons/ic_get_started_deco_cloud.svg",
+      "format": "SVG",
+      "dimensions": "30x26",
+      "screen": "Onboarding Step 3",
+      "usage": "Decorative cloud — bottom-left corner"
+    },
+    {
+      "nodeId": "11:1195",
+      "fileName": "ic_search_hero.svg",
+      "localPath": "assets/icons/ic_search_hero.svg",
+      "format": "SVG",
+      "dimensions": "128x136",
+      "screen": "Search",
+      "usage": "Hero illustration above search bar"
+    }
+  ]
+}

@@ -3,7 +3,9 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:permission_handler/permission_handler.dart';
+import '../../../core/constants/app_assets.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../../core/widgets/common_icon.dart';
 
 class SplashPage extends StatefulWidget {
   const SplashPage({super.key});
@@ -63,87 +65,96 @@ class _SplashPageState extends State<SplashPage>
     return Scaffold(
       backgroundColor: AppColors.splashBackground,
       body: SafeArea(
-        child: Column(
-          children: [
-            const Spacer(),
-            // Logo lockup
-            Column(
-              mainAxisSize: MainAxisSize.min,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 32),
+          child: Center(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Container(
-                  width: 96,
-                  height: 96,
-                  decoration: BoxDecoration(
-                    color: AppColors.locationButton.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(24),
-                  ),
-                  child: const Icon(
-                    Icons.air_rounded,
-                    size: 56,
-                    color: AppColors.locationButton,
-                  ),
+                // Top space — proportional to screen height (avoids overflow on small phones)
+                const Spacer(flex: 2),
+
+                // Logo lockup
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // App logo — 110×100 Figma export (ic_app_logo.png)
+                    const CommonIcon(
+                      path: AppAssets.icAppLogo,
+                      width: 110,
+                      height: 100,
+                    ),
+                    const SizedBox(height: 32),
+                    Text(
+                      'AeroSense',
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.inter(
+                        fontSize: 40,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.textPrimary,
+                        height: 1.25,
+                        letterSpacing: -0.5,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Making sense of the sky',
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.inter(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.textSecondary,
+                        height: 1.6,
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 24),
-                Text(
-                  'AeroSense',
-                  style: GoogleFonts.inter(
-                    fontSize: 40,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary,
-                    letterSpacing: -0.5,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'Making sense of the sky',
-                  style: GoogleFonts.inter(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w500,
-                    color: AppColors.textSecondary,
-                  ),
-                ),
-              ],
-            ),
-            const Spacer(),
-            // Loading section
-            Padding(
-              padding: const EdgeInsets.only(bottom: 64),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  AnimatedBuilder(
-                    animation: _progressAnimation,
-                    builder: (context, child) {
-                      return SizedBox(
-                        width: 200,
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(3),
-                          child: LinearProgressIndicator(
-                            value: _progressAnimation.value,
-                            minHeight: 6,
-                            backgroundColor: AppColors.locationButton
-                                .withValues(alpha: 0.15),
-                            valueColor: const AlwaysStoppedAnimation<Color>(
-                              AppColors.locationButton,
+
+                const Spacer(flex: 3),
+
+                // Loading section — fixed 48px bottom gap
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    AnimatedBuilder(
+                      animation: _progressAnimation,
+                      builder: (context, child) {
+                        return SizedBox(
+                          width: 200,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(3),
+                            child: LinearProgressIndicator(
+                              value: _progressAnimation.value,
+                              minHeight: 6,
+                              backgroundColor: AppColors.locationButton
+                                  .withValues(alpha: 0.15),
+                              valueColor: const AlwaysStoppedAnimation<Color>(
+                                AppColors.locationButton,
+                              ),
                             ),
                           ),
-                        ),
-                      );
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Loading weather data...',
-                    style: GoogleFonts.inter(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                      color: AppColors.textSecondary,
+                        );
+                      },
                     ),
-                  ),
-                ],
-              ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Loading weather data...',
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.inter(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.textSecondary,
+                        height: 1.33,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 48),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
