@@ -1,11 +1,18 @@
 import 'dart:math' as math;
+
+import 'package:dio/dio.dart';
 import 'package:aero_sense/core/models/geocoding_response.dart';
 import 'package:aero_sense/core/services/api_client.dart';
 
 class GeocodingProvider {
   final ApiClient _apiClient;
+  final ApiClient _nominatimClient;
 
-  GeocodingProvider() : _apiClient = ApiClient();
+  GeocodingProvider()
+    : _apiClient = ApiClient(baseUrl: ApiClient.geocodingBaseUrl),
+      _nominatimClient = ApiClient(
+        baseUrl: 'https://nominatim.openstreetmap.org',
+      );
 
   Future<List<GeocodingResult>> searchLocation({
     required String query,
@@ -22,7 +29,7 @@ class GeocodingProvider {
       };
 
       final response = await _apiClient.get(
-        '/v1/geocoding',
+        '/v1/search',
         queryParameters: queryParameters,
       );
 
@@ -64,6 +71,60 @@ class GeocodingProvider {
     }
   }
 
+  /// Reverse geocode [latitude]/[longitude] using the Nominatim API
+  /// (OpenStreetMap). Returns the nearest city/town/village.
+  Future<GeocodingResult> reverseGeocode({
+    required double latitude,
+    required double longitude,
+  }) async {
+    try {
+      final response = await _nominatimClient.get(
+        '/reverse',
+        queryParameters: {
+          'format': 'json',
+          'lat': latitude.toString(),
+          'lon': longitude.toString(),
+          'zoom': '10', // city-level granularity
+          'addressdetails': '1',
+        },
+        options: Options(
+          headers: {'User-Agent': 'AeroSense/1.0 (weather app)'},
+        ),
+      );
+
+      final data = response.data;
+      if (data == null) {
+        throw ApiException('Empty response from Nominatim API');
+      }
+
+      final address = data['address'] as Map<String, dynamic>? ?? {};
+      // Priority: city > town > village > suburb > county
+      final name =
+          address['city'] as String? ??
+          address['town'] as String? ??
+          address['village'] as String? ??
+          address['suburb'] as String? ??
+          address['county'] as String? ??
+          'Unknown';
+      final state = address['state'] as String?;
+      final country = address['country'] as String? ?? '';
+      final countryCode = address['country_code'] as String? ?? '';
+
+      return GeocodingResult(
+        latitude: latitude,
+        longitude: longitude,
+        name: name,
+        country: country,
+        countryCode: countryCode,
+        state: state,
+      );
+    } catch (e) {
+      if (e is ApiException) rethrow;
+      throw ApiException('Failed to reverse geocode: ${e.toString()}');
+    }
+  }
+
+  /// Kept for API compatibility; delegates to [reverseGeocode].
   Future<List<GeocodingResult>> searchByCoordinates({
     required double latitude,
     required double longitude,
@@ -71,58 +132,11 @@ class GeocodingProvider {
     String? language = 'en',
     String? format = 'json',
   }) async {
-    try {
-      final queryParameters = {
-        'latitude': latitude.toString(),
-        'longitude': longitude.toString(),
-        'count': count.toString(),
-        'language': language,
-        'format': format,
-      };
-
-      final response = await _apiClient.get(
-        '/v1/geocoding/reverse',
-        queryParameters: queryParameters,
-      );
-
-      final data = response.data;
-      if (data == null) {
-        throw ApiException('Empty response from reverse geocoding API');
-      }
-
-      return GeocodingResponse.fromJson(data).results;
-    } catch (e) {
-      if (e is ApiException) {
-        rethrow;
-      }
-      throw ApiException('Failed to reverse geocode coordinates: ${e.toString()}');
-    }
-  }
-
-  Future<GeocodingResult> reverseGeocode({
-    required double latitude,
-    required double longitude,
-    String? language = 'en',
-  }) async {
-    try {
-      final results = await searchByCoordinates(
-        latitude: latitude,
-        longitude: longitude,
-        count: 1,
-        language: language,
-      );
-
-      if (results.isEmpty) {
-        throw ApiException('No location found for coordinates: $latitude, $longitude');
-      }
-
-      return results.first;
-    } catch (e) {
-      if (e is ApiException) {
-        rethrow;
-      }
-      throw ApiException('Failed to reverse geocode: ${e.toString()}');
-    }
+    final result = await reverseGeocode(
+      latitude: latitude,
+      longitude: longitude,
+    );
+    return [result];
   }
 
   Future<List<GeocodingResult>> searchWithinBounds({
@@ -175,7 +189,9 @@ class GeocodingProvider {
       );
 
       return results
-          .where((result) => result.name.toLowerCase().contains(query.toLowerCase()))
+          .where(
+            (result) => result.name.toLowerCase().contains(query.toLowerCase()),
+          )
           .map((result) => result.formattedLocation)
           .toList();
     } catch (e) {
@@ -224,7 +240,10 @@ class GeocodingProvider {
 
   /// Validates if coordinates are within valid latitude and longitude ranges
   bool isValidCoordinates(double latitude, double longitude) {
-    return latitude >= -90 && latitude <= 90 && longitude >= -180 && longitude <= 180;
+    return latitude >= -90 &&
+        latitude <= 90 &&
+        longitude >= -180 &&
+        longitude <= 180;
   }
 
   /// Calculates distance between two coordinates using Haversine formula
@@ -239,8 +258,12 @@ class GeocodingProvider {
     final double dLat = _toRadians(lat2 - lat1);
     final double dLon = _toRadians(lon2 - lon1);
 
-    final double a = (math.sin(dLat / 2) * math.sin(dLat / 2)) +
-        (math.cos(_toRadians(lat1)) * math.cos(_toRadians(lat2)) * math.sin(dLon / 2) * math.sin(dLon / 2));
+    final double a =
+        (math.sin(dLat / 2) * math.sin(dLat / 2)) +
+        (math.cos(_toRadians(lat1)) *
+            math.cos(_toRadians(lat2)) *
+            math.sin(dLon / 2) *
+            math.sin(dLon / 2));
 
     final double c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a));
 

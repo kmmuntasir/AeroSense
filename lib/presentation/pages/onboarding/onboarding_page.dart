@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:permission_handler/permission_handler.dart';
 import '../../../core/controllers/location_controller.dart';
 
 /// OnboardingPage handles the first-launch experience.
@@ -24,33 +25,25 @@ class _OnboardingPageState extends State<OnboardingPage> {
   }
 
   Future<void> _initializeOnboarding() async {
-    // Give the UI a moment to render before checking permission
-    await Future.delayed(const Duration(milliseconds: 500));
+    // Read the real permission status directly — avoids a race condition
+    // with LocationController._checkLocationPermission() (not awaited in onInit).
+    final status = await Permission.location.status;
 
-    // Check if we already have permission
-    if (_locationController.hasPermission) {
-      // Permission already granted, get location and go to dashboard
-      final success = await _locationController.getCurrentLocation();
-      if (success && mounted) {
-        Get.offAllNamed('/dashboard');
-      } else if (mounted) {
-        Get.offAllNamed('/search');
-      }
-    } else {
-      // Permission not granted, request it
-      final granted = await _locationController.requestLocationPermission();
-      if (granted && mounted) {
-        // Get location and proceed to dashboard
-        final success = await _locationController.getCurrentLocation();
-        if (success && mounted) {
-          Get.offAllNamed('/dashboard');
-        } else if (mounted) {
-          Get.offAllNamed('/search');
-        }
-      } else if (mounted) {
-        // Permission denied, go to search/fallback
-        Get.offAllNamed('/search');
-      }
+    if (status.isPermanentlyDenied) {
+      if (mounted) Get.offAllNamed('/search');
+      return;
+    }
+
+    // Request permission (no-op / returns current status if already granted)
+    final granted = await _locationController.requestLocationPermission();
+    if (!granted) {
+      if (mounted) Get.offAllNamed('/search');
+      return;
+    }
+
+    final success = await _locationController.getCurrentLocation();
+    if (mounted) {
+      Get.offAllNamed(success ? '/dashboard' : '/search');
     }
   }
 
@@ -60,7 +53,9 @@ class _OnboardingPageState extends State<OnboardingPage> {
     final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF121212) : const Color(0xFFF8F9FA),
+      backgroundColor: isDark
+          ? const Color(0xFF121212)
+          : const Color(0xFFF8F9FA),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -73,11 +68,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                 color: const Color(0xFF4A90E2),
                 borderRadius: BorderRadius.circular(24),
               ),
-              child: const Icon(
-                Icons.cloud,
-                size: 64,
-                color: Colors.white,
-              ),
+              child: const Icon(Icons.cloud, size: 64, color: Colors.white),
             ),
             const SizedBox(height: 32),
             Text(

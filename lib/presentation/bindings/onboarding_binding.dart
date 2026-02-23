@@ -6,6 +6,8 @@ import '../../core/controllers/location_controller.dart';
 class OnboardingBinding extends Bindings {
   @override
   void dependencies() {
-    Get.lazyPut<LocationController>(() => LocationController());
+    // permanent: true — location data (GPS position) must survive route
+    // replacement (Get.offAllNamed) so the dashboard can read currentPosition.
+    Get.put<LocationController>(LocationController(), permanent: true);
   }
 }

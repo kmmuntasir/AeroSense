@@ -12,6 +12,9 @@ class LocationController extends GetxController {
 
   // Reactive variables
   final Rx<Position?> _currentPosition = Rx<Position?>(null);
+  final Rx<GeocodingResult?> _currentGeocodingResult = Rx<GeocodingResult?>(
+    null,
+  );
   final RxList<GeocodingResult> _savedLocations = RxList<GeocodingResult>([]);
   final RxBool _isLoading = RxBool(false);
   final RxString _errorMessage = RxString('');
@@ -52,12 +55,15 @@ class LocationController extends GetxController {
       _hasPermission.value = status.isGranted;
 
       if (status.isDenied) {
-        _errorMessage.value = 'Location permission is required for weather data';
+        _errorMessage.value =
+            'Location permission is required for weather data';
       } else if (status.isPermanentlyDenied) {
-        _errorMessage.value = 'Location permission permanently denied. Please enable in settings.';
+        _errorMessage.value =
+            'Location permission permanently denied. Please enable in settings.';
       }
     } catch (e) {
-      _errorMessage.value = 'Error checking location permission: ${e.toString()}';
+      _errorMessage.value =
+          'Error checking location permission: ${e.toString()}';
     }
   }
 
@@ -74,14 +80,16 @@ class LocationController extends GetxController {
         _errorMessage.value = '';
         return true;
       } else if (status.isPermanentlyDenied) {
-        _errorMessage.value = 'Location permission permanently denied. Please enable in settings.';
+        _errorMessage.value =
+            'Location permission permanently denied. Please enable in settings.';
         return false;
       } else {
         _errorMessage.value = 'Location permission denied';
         return false;
       }
     } catch (e) {
-      _errorMessage.value = 'Error requesting location permission: ${e.toString()}';
+      _errorMessage.value =
+          'Error requesting location permission: ${e.toString()}';
       return false;
     } finally {
       _isLoading.value = false;
@@ -102,7 +110,8 @@ class LocationController extends GetxController {
       // Check if location services are enabled
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
-        _errorMessage.value = 'Location services are disabled. Please enable location services.';
+        _errorMessage.value =
+            'Location services are disabled. Please enable location services.';
         return false;
       }
 
@@ -116,12 +125,31 @@ class LocationController extends GetxController {
 
       _currentPosition.value = position;
       _errorMessage.value = '';
+
+      // Reverse geocode in the background — updates city name once resolved.
+      _reverseGeocodePosition(position.latitude, position.longitude);
+
       return true;
     } catch (e) {
       _errorMessage.value = 'Failed to get current location: ${e.toString()}';
       return false;
     } finally {
       _isLoading.value = false;
+    }
+  }
+
+  Future<void> _reverseGeocodePosition(
+    double latitude,
+    double longitude,
+  ) async {
+    try {
+      final result = await _geocodingProvider.reverseGeocode(
+        latitude: latitude,
+        longitude: longitude,
+      );
+      _currentGeocodingResult.value = result;
+    } catch (_) {
+      // Non-critical — fall back to "Current Location"
     }
   }
 
@@ -169,7 +197,9 @@ class LocationController extends GetxController {
     try {
       // Check if location already exists
       final existingIndex = _savedLocations.indexWhere(
-        (saved) => saved.latitude == location.latitude && saved.longitude == location.longitude,
+        (saved) =>
+            saved.latitude == location.latitude &&
+            saved.longitude == location.longitude,
       );
 
       if (existingIndex == -1) {
@@ -186,7 +216,9 @@ class LocationController extends GetxController {
   Future<void> removeLocation(GeocodingResult location) async {
     try {
       _savedLocations.removeWhere(
-        (saved) => saved.latitude == location.latitude && saved.longitude == location.longitude,
+        (saved) =>
+            saved.latitude == location.latitude &&
+            saved.longitude == location.longitude,
       );
       _saveLocationsToStorage();
     } catch (e) {
@@ -197,22 +229,33 @@ class LocationController extends GetxController {
   /// Check if a location is saved
   bool isLocationSaved(GeocodingResult location) {
     return _savedLocations.any(
-      (saved) => saved.latitude == location.latitude && saved.longitude == location.longitude,
+      (saved) =>
+          saved.latitude == location.latitude &&
+          saved.longitude == location.longitude,
     );
   }
 
   /// Get saved locations with formatted names
   List<String> get savedLocationNames {
-    return _savedLocations.map((location) => location.formattedLocation).toList();
+    return _savedLocations
+        .map((location) => location.formattedLocation)
+        .toList();
   }
 
-  /// Get current location as GeocodingResult
+  /// Returns the current location as a [GeocodingResult].
+  /// Uses the reverse-geocoded city name once available; falls back to
+  /// "Current Location" while the reverse geocode is still in flight.
   GeocodingResult? get currentLocationAsGeocodingResult {
-    if (_currentPosition.value == null) return null;
+    // Reading both reactive vars so Obx() rebuilds when either changes.
+    final geocoded = _currentGeocodingResult.value;
+    final position = _currentPosition.value;
+
+    if (position == null) return null;
+    if (geocoded != null) return geocoded;
 
     return GeocodingResult(
-      latitude: _currentPosition.value!.latitude,
-      longitude: _currentPosition.value!.longitude,
+      latitude: position.latitude,
+      longitude: position.longitude,
       name: 'Current Location',
       country: '',
       countryCode: '',
@@ -222,6 +265,7 @@ class LocationController extends GetxController {
   /// Clear current location
   void clearCurrentLocation() {
     _currentPosition.value = null;
+    _currentGeocodingResult.value = null;
     _errorMessage.value = '';
   }
 
@@ -233,10 +277,13 @@ class LocationController extends GetxController {
   /// Save locations to storage
   void _saveLocationsToStorage() {
     try {
-      final locationsJson = _savedLocations.map((location) => location.toJson()).toList();
+      final locationsJson = _savedLocations
+          .map((location) => location.toJson())
+          .toList();
       _storage.write('saved_locations', locationsJson);
     } catch (e) {
-      _errorMessage.value = 'Failed to save locations to storage: ${e.toString()}';
+      _errorMessage.value =
+          'Failed to save locations to storage: ${e.toString()}';
     }
   }
 

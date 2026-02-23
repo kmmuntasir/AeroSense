@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <!-- Dark cloud -->
+  <path d="M50 30H18C12.48 30 8 25.52 8 20C8 15.04 11.6 10.9 16.36 10.12C17.8 5.44 22.08 2 27.2 2C33.16 2 38 6.84 38 12.8V13C38 13 38.4 13 38.8 13C44.04 13.24 48.2 17.56 48 22.8C47.84 26.8 45.28 30 42 30H50Z" fill="#475569"/>
+  <!-- Lightning bolt -->
+  <path d="M35 32L26 46H33L28 62L44 44H37L42 32H35Z" fill="#FCD34D"/>
+  <!-- Rain drops -->
+  <line x1="14" y1="36" x2="11" y2="44" stroke="#3B82F6" stroke-width="2" stroke-linecap="round"/>
+  <line x1="50" y1="36" x2="47" y2="44" stroke="#3B82F6" stroke-width="2" stroke-linecap="round"/>
+</svg>

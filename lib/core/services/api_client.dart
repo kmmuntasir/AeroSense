@@ -1,20 +1,23 @@
 import 'package:dio/dio.dart';
 
 class ApiClient {
-  static const String _baseUrl = 'https://api.open-meteo.com';
+  static const String weatherBaseUrl = 'https://api.open-meteo.com';
+  static const String geocodingBaseUrl = 'https://geocoding-api.open-meteo.com';
 
   late final Dio _dio;
 
-  ApiClient() {
-    _dio = Dio(BaseOptions(
-      baseUrl: _baseUrl,
-      connectTimeout: const Duration(seconds: 30),
-      receiveTimeout: const Duration(seconds: 30),
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-      },
-    ));
+  ApiClient({String? baseUrl}) {
+    _dio = Dio(
+      BaseOptions(
+        baseUrl: baseUrl ?? weatherBaseUrl,
+        connectTimeout: const Duration(seconds: 30),
+        receiveTimeout: const Duration(seconds: 30),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+      ),
+    );
 
     // Add interceptors for logging and error handling
     _dio.interceptors.add(
@@ -119,11 +122,15 @@ class ApiClient {
       case DioExceptionType.connectionTimeout:
       case DioExceptionType.sendTimeout:
       case DioExceptionType.receiveTimeout:
-        throw ApiException('Connection timeout. Please check your internet connection.');
+        throw ApiException(
+          'Connection timeout. Please check your internet connection.',
+        );
       case DioExceptionType.badResponse:
         final statusCode = error.response?.statusCode;
         if (statusCode == 401) {
-          throw ApiException('Unauthorized access. Please check your credentials.');
+          throw ApiException(
+            'Unauthorized access. Please check your credentials.',
+          );
         } else if (statusCode == 404) {
           throw ApiException('Resource not found.');
         } else if (statusCode == 500) {

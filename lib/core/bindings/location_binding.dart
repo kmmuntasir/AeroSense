@@ -4,6 +4,7 @@ import 'package:aero_sense/core/controllers/location_controller.dart';
 class LocationBinding implements Bindings {
   @override
   void dependencies() {
-    Get.lazyPut<LocationController>(() => LocationController());
+    // permanent: true — persists when navigating from search to dashboard.
+    Get.put<LocationController>(LocationController(), permanent: true);
   }
 }

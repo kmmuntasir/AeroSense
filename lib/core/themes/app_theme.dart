@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 
 class AppTheme {
   // Primary colors
-  static const Color primaryColor = Color(0xFF42A5F5);
+  static const Color primaryColor = Color(0xFF2B3BEE);
   static const Color secondaryColor = Color(0xFF26C6DA);
   static const Color accentColor = Color(0xFFFF7043);
 
   // Background colors
-  static const Color lightBackground = Color(0xFFF5F5F5);
+  static const Color lightBackground = Color(0xFFF6F6F8);
   static const Color darkBackground = Color(0xFF121212);
 
   // Text colors
@@ -46,16 +46,12 @@ class AppTheme {
           foregroundColor: Colors.white,
           elevation: 2,
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
       ),
       cardTheme: CardThemeData(
         elevation: 2,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         color: Colors.white,
       ),
       textTheme: const TextTheme(
@@ -84,14 +80,8 @@ class AppTheme {
           fontWeight: FontWeight.w600,
           color: lightTextPrimary,
         ),
-        bodyLarge: TextStyle(
-          fontSize: 16,
-          color: lightTextPrimary,
-        ),
-        bodyMedium: TextStyle(
-          fontSize: 14,
-          color: lightTextSecondary,
-        ),
+        bodyLarge: TextStyle(fontSize: 16, color: lightTextPrimary),
+        bodyMedium: TextStyle(fontSize: 14, color: lightTextSecondary),
       ),
     );
   }
@@ -126,16 +116,12 @@ class AppTheme {
           foregroundColor: Colors.white,
           elevation: 2,
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
       ),
       cardTheme: CardThemeData(
         elevation: 2,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         color: const Color(0xFF1E1E1E),
       ),
       textTheme: const TextTheme(
@@ -164,14 +150,8 @@ class AppTheme {
           fontWeight: FontWeight.w600,
           color: darkTextPrimary,
         ),
-        bodyLarge: TextStyle(
-          fontSize: 16,
-          color: darkTextPrimary,
-        ),
-        bodyMedium: TextStyle(
-          fontSize: 14,
-          color: darkTextSecondary,
-        ),
+        bodyLarge: TextStyle(fontSize: 16, color: darkTextPrimary),
+        bodyMedium: TextStyle(fontSize: 14, color: darkTextSecondary),
       ),
     );
   }
