@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import 'package:aero_sense/core/controllers/location_controller.dart';
 import 'package:aero_sense/core/controllers/weather_controller.dart';
+import 'package:aero_sense/presentation/controllers/locations_controller.dart';
 
 class DashboardBinding implements Bindings {
   @override
@@ -12,5 +13,6 @@ class DashboardBinding implements Bindings {
       Get.put<LocationController>(LocationController(), permanent: true);
     }
     Get.lazyPut<WeatherController>(() => WeatherController());
+    Get.lazyPut<LocationsController>(() => LocationsController());
   }
 }
