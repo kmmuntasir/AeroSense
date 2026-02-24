@@ -331,7 +331,7 @@ class _DetailStatsGrid extends StatelessWidget {
       mainAxisSpacing: 12,
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      childAspectRatio: 1.05,
+      childAspectRatio: 1.25,
       children: [
         _StatCard(
           icon: Icons.water_drop_outlined,
