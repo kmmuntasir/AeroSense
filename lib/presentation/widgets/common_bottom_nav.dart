@@ -18,8 +18,6 @@ class CommonBottomNav extends StatelessWidget {
       case 2:
         Get.offNamed('/weather-alerts');
       case 3:
-        Get.offNamed('/forecast-details');
-      case 4:
         Get.offNamed('/settings');
     }
   }
@@ -58,11 +56,6 @@ class CommonBottomNav extends StatelessWidget {
             icon: Icon(Icons.warning_outlined),
             selectedIcon: Icon(Icons.warning),
             label: 'Alerts',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.calendar_today_outlined),
-            selectedIcon: Icon(Icons.calendar_today),
-            label: 'Forecast',
           ),
           NavigationDestination(
             icon: Icon(Icons.settings_outlined),

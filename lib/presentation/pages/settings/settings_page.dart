@@ -21,7 +21,7 @@ class SettingsPage extends GetView<SettingsController> {
         backgroundColor: cs.surfaceContainer,
         title: const Text('Settings'),
       ),
-      bottomNavigationBar: const CommonBottomNav(selectedIndex: 4),
+      bottomNavigationBar: const CommonBottomNav(selectedIndex: 3),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
