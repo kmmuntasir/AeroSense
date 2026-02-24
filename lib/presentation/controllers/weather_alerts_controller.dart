@@ -1,3 +1,4 @@
+import 'package:aero_sense/core/controllers/location_controller.dart';
 import 'package:aero_sense/core/models/weather_alert_response.dart';
 import 'package:aero_sense/core/services/alerts_provider.dart';
 import 'package:flutter/material.dart';
@@ -16,14 +17,11 @@ class PastAlert {
 }
 
 /// Controller for the Weather Alerts page.
-/// Manages weather alerts fetched from network.
+/// Manages weather alerts fetched from device location using network.
 class WeatherAlertsController extends GetxController {
   // Dependencies
   final AlertsProvider _alertsProvider = AlertsProvider();
-
-  // Alert location coordinates (San Francisco, CA)
-  final double alertLatitude = 37.7749;
-  final double alertLongitude = -122.4194;
+  final LocationController _locationController = Get.find<LocationController>();
 
   // Reactive variables
   final Rx<WeatherAlert?> _activeAlert = Rx<WeatherAlert?>(null);
@@ -31,6 +29,10 @@ class WeatherAlertsController extends GetxController {
   final RxBool _isLoading = RxBool(false);
   final RxString _errorMessage = RxString('');
   final RxBool isExpanded = RxBool(false);
+
+  // Location coordinates (will be updated from device location)
+  late double alertLatitude;
+  late double alertLongitude;
 
   // Getters
   WeatherAlert? get activeAlert => _activeAlert.value;
@@ -50,25 +52,65 @@ class WeatherAlertsController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    fetchAlerts();
+    _initializeLocation();
   }
 
-  /// Fetch alerts from network
+  /// Initialize location and fetch alerts
+  Future<void> _initializeLocation() async {
+    try {
+      final position = _locationController.currentPosition;
+
+      if (position != null) {
+        alertLatitude = position.latitude;
+        alertLongitude = position.longitude;
+        await fetchAlerts();
+      } else {
+        // Get location if not already available
+        _isLoading.value = true;
+        final success = await _locationController.getCurrentLocation();
+
+        if (success && _locationController.currentPosition != null) {
+          final pos = _locationController.currentPosition!;
+          alertLatitude = pos.latitude;
+          alertLongitude = pos.longitude;
+          await fetchAlerts();
+        } else {
+          _errorMessage.value =
+              'Unable to get device location. Please enable location services.';
+        }
+      }
+    } catch (e) {
+      _errorMessage.value = 'Failed to initialize location: ${e.toString()}';
+    } finally {
+      _isLoading.value = false;
+    }
+  }
+
+  /// Fetch alerts from network using device location
   Future<void> fetchAlerts() async {
     _isLoading.value = true;
     _errorMessage.value = '';
 
     try {
+      // Get current device location
+      final position = _locationController.currentPosition;
+
+      if (position == null) {
+        _errorMessage.value = 'Device location not available';
+        return;
+      }
+
+      // Fetch alerts for current location
       final alerts = await _alertsProvider.getMockAlerts(
-        latitude: alertLatitude,
-        longitude: alertLongitude,
-        location: 'San Francisco, CA',
+        latitude: position.latitude,
+        longitude: position.longitude,
+        location: 'Your Location',
       );
 
       if (alerts.isEmpty) {
         _activeAlert.value = null;
         _allAlerts.value = [];
-        _errorMessage.value = 'No alerts available for this location';
+        _errorMessage.value = 'No alerts available for your location';
       } else {
         _activeAlert.value = alerts.first;
         _allAlerts.value = alerts;
@@ -82,8 +124,11 @@ class WeatherAlertsController extends GetxController {
     }
   }
 
-  /// Refresh alerts
-  Future<void> refreshAlerts() => fetchAlerts();
+  /// Refresh alerts with current location
+  Future<void> refreshAlerts() async {
+    await _locationController.getCurrentLocation();
+    await fetchAlerts();
+  }
 
   void toggleExpand() => isExpanded.toggle();
 
