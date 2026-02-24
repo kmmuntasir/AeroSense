@@ -1,15 +1,15 @@
+import 'package:aero_sense/core/controllers/location_controller.dart';
+import 'package:aero_sense/core/controllers/weather_controller.dart';
+import 'package:aero_sense/core/models/geocoding_response.dart';
+import 'package:aero_sense/presentation/widgets/dashboard/air_quality_card.dart';
+import 'package:aero_sense/presentation/widgets/dashboard/current_weather_hero.dart';
+import 'package:aero_sense/presentation/widgets/dashboard/daily_forecast_list.dart';
+import 'package:aero_sense/presentation/widgets/dashboard/hourly_forecast_list.dart';
+import 'package:aero_sense/presentation/widgets/dashboard/humidity_card.dart';
+import 'package:aero_sense/presentation/widgets/dashboard/insights_card.dart';
+import 'package:aero_sense/presentation/widgets/dashboard/wind_card.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:aero_sense/core/controllers/weather_controller.dart';
-import 'package:aero_sense/core/controllers/location_controller.dart';
-import 'package:aero_sense/core/models/geocoding_response.dart';
-import 'package:aero_sense/presentation/widgets/dashboard/current_weather_hero.dart';
-import 'package:aero_sense/presentation/widgets/dashboard/insights_card.dart';
-import 'package:aero_sense/presentation/widgets/dashboard/hourly_forecast_list.dart';
-import 'package:aero_sense/presentation/widgets/dashboard/daily_forecast_list.dart';
-import 'package:aero_sense/presentation/widgets/dashboard/air_quality_card.dart';
-import 'package:aero_sense/presentation/widgets/dashboard/wind_card.dart';
-import 'package:aero_sense/presentation/widgets/dashboard/humidity_card.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -56,10 +56,10 @@ class _DashboardPageState extends State<DashboardPage> {
       case 1:
         Get.toNamed('/search');
       case 2:
-        // TODO: Navigate to Alerts (Task 11)
+        Get.toNamed('/weather-alerts');
         break;
       case 3:
-        // TODO: Navigate to Settings (Task 10)
+        Get.toNamed('/settings');
         break;
       default:
         setState(() => _selectedNavIndex = index);
