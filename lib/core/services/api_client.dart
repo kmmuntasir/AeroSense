@@ -1,14 +1,15 @@
 import 'package:dio/dio.dart';
 
 class ApiClient {
-  static const String _baseUrl = 'https://api.open-meteo.com';
+  static const String weatherBaseUrl = 'https://api.open-meteo.com';
+  static const String geocodingBaseUrl = 'https://geocoding-api.open-meteo.com';
 
   late final Dio _dio;
 
-  ApiClient() {
+  ApiClient({String? baseUrl}) {
     _dio = Dio(
       BaseOptions(
-        baseUrl: _baseUrl,
+        baseUrl: baseUrl ?? weatherBaseUrl,
         connectTimeout: const Duration(seconds: 30),
         receiveTimeout: const Duration(seconds: 30),
         headers: {

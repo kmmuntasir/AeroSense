@@ -161,6 +161,60 @@ class _SearchPageState extends State<SearchPage> {
 
             // Heading — exact Figma copy, 28px Bold
             Padding(
+              /*padding: const EdgeInsets.all(16.0),
+              child: Column(
+                children: [
+                  const SizedBox(height: 16),
+                  // Search icon (optional visual)
+                  Icon(Icons.search, size: 48, color: const Color(0xFF4A90E2)),
+                  const SizedBox(height: 24),
+                  // Headline
+                  Text(
+                    "Let's find your weather",
+                    style: theme.textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: isDark ? Colors.white : const Color(0xFF121212),
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 8),
+                  // Subtext
+                  Text(
+                    'Search for a city to check the current forecast.',
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: isDark ? Colors.white70 : const Color(0xFF6B7280),
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 32),
+                  // Search Bar
+                  Container(
+                    height: 56,
+                    decoration: BoxDecoration(
+                      color: isDark
+                          ? const Color(0xFF2A2D32)
+                          : const Color(0xFFEDEDED),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: TextField(
+                      controller: _searchController,
+                      focusNode: _focusNode,
+                      onChanged: _onSearchChanged,
+                      decoration: InputDecoration(
+                        hintText: 'Search city...',
+                        hintStyle: TextStyle(
+                          color: isDark
+                              ? Colors.white38
+                              : const Color(0xFF9CA3AF),
+                        ),
+                        prefixIcon: const Icon(
+                          Icons.search,
+                          color: Color(0xFF4A90E2),
+                        ),
+                        border: InputBorder.none,
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 16,*/
               padding: const EdgeInsets.symmetric(horizontal: 32),
               child: Text(
                 "Let's find your weather",
@@ -293,6 +347,11 @@ class _SearchPageState extends State<SearchPage> {
                 if (_searchResults.isEmpty) {
                   return Center(
                     child: Text(
+                      /*_searchController.text.isEmpty ? '' : 'No cities found',
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: isDark
+                            ? Colors.white60
+                            : const Color(0xFF6B7280),*/
                       'No cities found',
                       style: GoogleFonts.spaceGrotesk(
                         fontSize: 16,
@@ -305,9 +364,54 @@ class _SearchPageState extends State<SearchPage> {
                 return ListView.separated(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
                   itemCount: _searchResults.length,
-                  separatorBuilder: (context, index) => const SizedBox(height: 8),
+                  separatorBuilder: (context, index) =>
+                      const SizedBox(height: 8),
                   itemBuilder: (context, index) {
                     final location = _searchResults[index];
+                    /*return Container(
+                      decoration: BoxDecoration(
+                        color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: ListTile(
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
+                        leading: Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: const Color(
+                              0xFF4A90E2,
+                            ).withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const Icon(
+                            Icons.location_city,
+                            color: Color(0xFF4A90E2),
+                            size: 24,
+                          ),
+                        ),
+                        title: Text(
+                          location.name,
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: isDark
+                                ? Colors.white
+                                : const Color(0xFF121212),
+                          ),
+                        ),
+                        subtitle: Text(
+                          location.formattedLocation,
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: isDark
+                                ? Colors.white60
+                                : const Color(0xFF6B7280),
+                          ),
+                        ),
+                        onTap: () => _onLocationSelected(location),
+                      ),*/
                     return _SearchResultTile(
                       location: location,
                       onTap: () => _onLocationSelected(location),

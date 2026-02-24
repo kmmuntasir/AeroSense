@@ -1,11 +1,18 @@
 import 'dart:math' as math;
+
+import 'package:dio/dio.dart';
 import 'package:aero_sense/core/models/geocoding_response.dart';
 import 'package:aero_sense/core/services/api_client.dart';
 
 class GeocodingProvider {
   final ApiClient _apiClient;
+  final ApiClient _nominatimClient;
 
-  GeocodingProvider() : _apiClient = ApiClient();
+  GeocodingProvider()
+    : _apiClient = ApiClient(baseUrl: ApiClient.geocodingBaseUrl),
+      _nominatimClient = ApiClient(
+        baseUrl: 'https://nominatim.openstreetmap.org',
+      );
 
   Future<List<GeocodingResult>> searchLocation({
     required String query,
@@ -22,7 +29,7 @@ class GeocodingProvider {
       };
 
       final response = await _apiClient.get(
-        '/v1/geocoding',
+        '/v1/search',
         queryParameters: queryParameters,
       );
 
@@ -64,47 +71,66 @@ class GeocodingProvider {
     }
   }
 
+  /// Reverse geocode [latitude]/[longitude] using the Nominatim API
+  /// (OpenStreetMap). Returns the nearest city/town/village.
+  Future<GeocodingResult> reverseGeocode({
+    required double latitude,
+    required double longitude,
+  }) async {
+    try {
+      final response = await _nominatimClient.get(
+        '/reverse',
+        queryParameters: {
+          'format': 'json',
+          'lat': latitude.toString(),
+          'lon': longitude.toString(),
+          'zoom': '10', // city-level granularity
+          'addressdetails': '1',
+        },
+        options: Options(
+          headers: {'User-Agent': 'AeroSense/1.0 (weather app)'},
+        ),
+      );
+
+      final data = response.data;
+      if (data == null) {
+        throw ApiException('Empty response from Nominatim API');
+      }
+
+      final address = data['address'] as Map<String, dynamic>? ?? {};
+      // Priority: city > town > village > suburb > county
+      final name =
+          address['city'] as String? ??
+          address['town'] as String? ??
+          address['village'] as String? ??
+          address['suburb'] as String? ??
+          address['county'] as String? ??
+          'Unknown';
+      final state = address['state'] as String?;
+      final country = address['country'] as String? ?? '';
+      final countryCode = address['country_code'] as String? ?? '';
+
+      return GeocodingResult(
+        latitude: latitude,
+        longitude: longitude,
+        name: name,
+        country: country,
+        countryCode: countryCode,
+        state: state,
+      );
+    } catch (e) {
+      if (e is ApiException) rethrow;
+      throw ApiException('Failed to reverse geocode: ${e.toString()}');
+    }
+  }
+
+  /// Kept for API compatibility; delegates to [reverseGeocode].
   Future<List<GeocodingResult>> searchByCoordinates({
     required double latitude,
     required double longitude,
     int? count = 10,
     String? language = 'en',
     String? format = 'json',
-  }) async {
-    try {
-      final queryParameters = {
-        'latitude': latitude.toString(),
-        'longitude': longitude.toString(),
-        'count': count.toString(),
-        'language': language,
-        'format': format,
-      };
-
-      final response = await _apiClient.get(
-        '/v1/geocoding/reverse',
-        queryParameters: queryParameters,
-      );
-
-      final data = response.data;
-      if (data == null) {
-        throw ApiException('Empty response from reverse geocoding API');
-      }
-
-      return GeocodingResponse.fromJson(data).results;
-    } catch (e) {
-      if (e is ApiException) {
-        rethrow;
-      }
-      throw ApiException(
-        'Failed to reverse geocode coordinates: ${e.toString()}',
-      );
-    }
-  }
-
-  Future<GeocodingResult> reverseGeocode({
-    required double latitude,
-    required double longitude,
-    String? language = 'en',
   }) async {
     try {
       final results = await searchByCoordinates(

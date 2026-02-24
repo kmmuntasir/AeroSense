@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <!-- Cloud -->
+  <path d="M50 30H18C12.48 30 8 25.52 8 20C8 15.04 11.6 10.9 16.36 10.12C17.8 5.44 22.08 2 27.2 2C33.16 2 38 6.84 38 12.8V13C38 13 38.4 13 38.8 13C44.04 13.24 48.2 17.56 48 22.8C47.84 26.8 45.28 30 42 30H50Z" fill="#64748B"/>
+  <!-- Rain drops -->
+  <line x1="18" y1="38" x2="14" y2="50" stroke="#3B82F6" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="28" y1="38" x2="24" y2="50" stroke="#3B82F6" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="38" y1="38" x2="34" y2="50" stroke="#3B82F6" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="48" y1="38" x2="44" y2="50" stroke="#3B82F6" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="23" y1="50" x2="19" y2="62" stroke="#3B82F6" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="33" y1="50" x2="29" y2="62" stroke="#3B82F6" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="43" y1="50" x2="39" y2="62" stroke="#3B82F6" stroke-width="2.5" stroke-linecap="round"/>
+</svg>

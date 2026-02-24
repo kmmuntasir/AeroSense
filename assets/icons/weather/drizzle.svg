@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <!-- Cloud -->
+  <path d="M48 32H16C10.48 32 6 27.52 6 22C6 17.04 9.6 12.9 14.36 12.12C15.8 7.44 20.08 4 25.2 4C31.16 4 36 8.84 36 14.8V15C36.4 15 36.8 15 36.8 15C42.04 15.24 46.2 19.56 46 24.8C45.84 28.8 43.28 32 40 32H48Z" fill="#94A3B8"/>
+  <!-- Drizzle drops (short lines) -->
+  <line x1="20" y1="40" x2="18" y2="48" stroke="#60A5FA" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="30" y1="40" x2="28" y2="48" stroke="#60A5FA" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="40" y1="40" x2="38" y2="48" stroke="#60A5FA" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="25" y1="50" x2="23" y2="58" stroke="#60A5FA" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="35" y1="50" x2="33" y2="58" stroke="#60A5FA" stroke-width="2.5" stroke-linecap="round"/>
+</svg>
