@@ -1,6 +1,7 @@
 import 'package:aero_sense/core/constants/app_constants.dart';
 import 'package:aero_sense/core/models/forecast_response.dart';
 import 'package:aero_sense/presentation/controllers/forecast_details_controller.dart';
+import 'package:aero_sense/presentation/widgets/common_bottom_nav.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -24,6 +25,7 @@ class ForecastDetailsPage extends GetView<ForecastDetailsController> {
           ),
         ],
       ),
+      bottomNavigationBar: const CommonBottomNav(selectedIndex: 3),
       body: Obx(
         () => controller.isLoading
             ? const Center(child: CircularProgressIndicator.adaptive())

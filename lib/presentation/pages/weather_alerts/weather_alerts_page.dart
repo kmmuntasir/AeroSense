@@ -1,5 +1,6 @@
 import 'package:aero_sense/core/constants/app_constants.dart';
 import 'package:aero_sense/presentation/controllers/weather_alerts_controller.dart';
+import 'package:aero_sense/presentation/widgets/common_bottom_nav.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:get/get.dart';
@@ -19,6 +20,7 @@ class WeatherAlertsPage extends GetView<WeatherAlertsController> {
         ),
         title: const Text('Weather Alerts'),
       ),
+      bottomNavigationBar: const CommonBottomNav(selectedIndex: 2),
       body: Obx(
         () => controller.isLoading
             ? const Center(child: CircularProgressIndicator.adaptive())
