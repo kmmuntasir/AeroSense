@@ -12,9 +12,5 @@ void main() {
       expect(find.text('AeroSense'), findsOneWidget);
       expect(find.text('Making sense of the sky'), findsOneWidget);
     });
-  // Basic smoke test: app widget builds without crashing
-  // Note: Full initialization tests should use integration_test/
-  test('App widget is defined', () {
-    expect(AeroSenseApp, isNotNull);
   });
-
+}
