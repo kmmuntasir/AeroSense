@@ -8,12 +8,12 @@ import '../presentation/pages/shell/main_shell_page.dart';
 import '../presentation/pages/forecast_details/forecast_details_page.dart';
 import '../presentation/pages/weather_alerts/weather_alerts_page.dart';
 import '../presentation/pages/locations/locations_page.dart';
-import '../presentation/controllers/forecast_details_controller.dart';
 import '../presentation/controllers/weather_alerts_controller.dart';
 import '../presentation/bindings/onboarding_binding.dart';
 import '../presentation/bindings/main_shell_binding.dart';
 import '../presentation/bindings/dashboard_binding.dart';
 import '../presentation/bindings/locations_binding.dart';
+import '../presentation/bindings/forecast_details_binding.dart';
 import '../core/bindings/location_binding.dart';
 import '../core/bindings/settings_binding.dart';
 
@@ -40,13 +40,11 @@ class AppPages {
       transition: Transition.cupertino,
     ),
 
-    // Forecast Details - standalone for development/testing
+    // Forecast Details - detailed weather forecast view
     GetPage(
       name: '/forecast-details',
       page: () => const ForecastDetailsPage(),
-      binding: BindingsBuilder(
-        () => Get.lazyPut(() => ForecastDetailsController()),
-      ),
+      binding: ForecastDetailsBinding(),
       transition: Transition.cupertino,
     ),
 
