@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:permission_handler/permission_handler.dart';
-import '../../../core/controllers/location_controller.dart';
 
 /// OnboardingPage handles the first-launch experience.
 /// It shows a loading state while checking location permission,
 /// then routes the user appropriately:
 /// - Location granted: Navigate to Dashboard
 /// - Location denied: Navigate to Search/Fallback view
-//class OnboardingPage extends StatefulWidget {
+
 import 'package:google_fonts/google_fonts.dart';
+
 import '../../../core/constants/app_assets.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/widgets/common_icon.dart';
@@ -22,7 +21,6 @@ class OnboardingPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = Get.find<OnboardingController>();
     return Scaffold(
-      // Steps 2 & 3 use #F6F6F8; Step 1 is #F6F7F8 — diff is 1 green unit, undetectable
       backgroundColor: AppColors.pageBackground,
       body: SafeArea(
         child: PageView(
@@ -65,12 +63,12 @@ class _OnboardingProgressDots extends StatelessWidget {
             borderRadius: BorderRadius.circular(4),
             boxShadow: isActive
                 ? [
-              BoxShadow(
-                color: AppColors.progressDotActive.withValues(alpha: 0.5),
-                blurRadius: 4,
-                offset: const Offset(0, 1),
-              ),
-            ]
+                    BoxShadow(
+                      color: AppColors.progressDotActive.withValues(alpha: 0.5),
+                      blurRadius: 4,
+                      offset: const Offset(0, 1),
+                    ),
+                  ]
                 : null,
           ),
         );
@@ -79,7 +77,7 @@ class _OnboardingProgressDots extends StatelessWidget {
   }
 }
 
-  /*Future<void> _initializeOnboarding() async {
+/*Future<void> _initializeOnboarding() async {
     // Read the real permission status directly — avoids a race condition
     // with LocationController._checkLocationPermission() (not awaited in onInit).
     final status = await Permission.location.status;
