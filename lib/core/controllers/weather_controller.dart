@@ -1,12 +1,12 @@
 import 'dart:math' as math;
 
-import 'package:get/get.dart';
+import 'package:aero_sense/core/controllers/location_controller.dart';
 import 'package:aero_sense/core/models/air_quality_response.dart';
+import 'package:aero_sense/core/models/temperature_unit.dart';
 import 'package:aero_sense/core/models/weather_response.dart';
 import 'package:aero_sense/core/services/air_quality_provider.dart';
 import 'package:aero_sense/core/services/weather_provider.dart';
-import 'package:aero_sense/core/controllers/location_controller.dart';
-import 'package:aero_sense/core/models/temperature_unit.dart';
+import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 
 class WeatherController extends GetxController {
@@ -387,29 +387,41 @@ class WeatherController extends GetxController {
 
   // ── Flight suitability ─────────────────────────────────────────────────────
 
-  bool get isSuitableForFlight {
-    if (_currentWeather.value == null) return false;
-    final weather = _currentWeather.value!;
-    final temp = weather.current.temperature2M ?? 0.0;
-    final windSpeed = weather.current.windSpeed10M ?? 0.0;
-    const precipitationThreshold = 2.0;
-    const maxWindSpeed = 15.0;
-    const tempRangeMin = -10.0;
-    const tempRangeMax = 40.0;
-
-    if (temp < tempRangeMin || temp > tempRangeMax) return false;
-    if (windSpeed > maxWindSpeed) return false;
-    if ((weather.current.precipitation ?? 0) > precipitationThreshold) {
-      return false;
-    }
-    return true;
-  }
-
   String get flightSuitabilityMessage {
     if (!isSuitableForFlight) {
       return 'Current conditions are not suitable for drone flight';
     }
     return 'Conditions are suitable for drone flight';
+  }
+
+  /// Check if current weather is suitable for drone flight
+  bool get isSuitableForFlight {
+    if (_currentWeather.value == null) return false;
+
+    final weather = _currentWeather.value!;
+    final temp = weather.current.temperature2M ?? 0.0;
+    final windSpeed = weather.current.windSpeed10M ?? 0.0;
+    const precipitationThreshold = 2.0; // mm
+    const maxWindSpeed = 15.0; // m/s
+    const tempRangeMin = -10.0; // °C
+    const tempRangeMax = 40.0; // °C
+
+    // Check temperature range
+    if (temp < tempRangeMin || temp > tempRangeMax) {
+      return false;
+    }
+
+    // Check wind speed
+    if (windSpeed > maxWindSpeed) {
+      return false;
+    }
+
+    // Check precipitation
+    if ((weather.current.precipitation ?? 0) > precipitationThreshold) {
+      return false;
+    }
+
+    return true;
   }
 
   // ── Misc public ───────────────────────────────────────────────────────────
@@ -446,29 +458,6 @@ class WeatherController extends GetxController {
 
     _currentWeather.value = results[0] as WeatherResponse;
     _currentAqi.value = (results[1] as AirQualityResponse).usAqi;
-  }
-
-  Future<void> _initializeWeatherData() async {
-    try {
-      final savedWeatherDataJson = _storage.read('saved_weather_data');
-      if (savedWeatherDataJson != null) {
-        final weatherMap = Map<String, dynamic>.from(savedWeatherDataJson);
-        _savedWeatherData.value = weatherMap.map(
-          (key, value) => MapEntry(key, WeatherResponse.fromJson(value)),
-        );
-      }
-
-      final savedUnit = _storage.read('temperature_unit');
-      if (savedUnit != null) {
-        _temperatureUnit.value = TemperatureUnit.values.firstWhere(
-          (unit) => unit.name == savedUnit,
-          orElse: () => TemperatureUnit.celsius,
-        );
-      }
-    } catch (e) {
-      _errorMessage.value =
-          'Failed to initialize weather data: ${e.toString()}';
-    }
   }
 
   void _updateMeaningInsights() {
@@ -516,73 +505,6 @@ class WeatherController extends GetxController {
     insights += 'Conditions: $condition';
 
     _meaningInsights.value = insights;
-  }
-
-  /// Refresh current weather data
-  Future<bool> refreshWeather() async {
-    return await fetchCurrentWeather();
-  }
-
-  /// Clear current weather data
-  void clearCurrentWeather() {
-    _currentWeather.value = null;
-    _errorMessage.value = '';
-    _meaningInsights.value = 'No weather data available';
-  }
-
-  /// Remove saved weather data for a location
-  void removeSavedWeather(String locationKey) {
-    _savedWeatherData.value = Map.from(_savedWeatherData.value)
-      ..remove(locationKey);
-    _saveWeatherDataToStorage();
-  }
-
-  /// Get weather forecast for the next 7 days
-  List<DailyWeather> get dailyForecast {
-    return _currentWeather.value?.daily ?? [];
-  }
-
-  /// Get hourly forecast for the next 24 hours
-  List<HourlyWeather> get hourlyForecast {
-    return _currentWeather.value?.hourly.take(24).toList() ?? [];
-  }
-
-  /// Check if current weather is suitable for drone flight
-  bool get isSuitableForFlight {
-    if (_currentWeather.value == null) return false;
-
-    final weather = _currentWeather.value!;
-    final temp = weather.current.temperature2M ?? 0.0;
-    final windSpeed = weather.current.windSpeed10M ?? 0.0;
-    const precipitationThreshold = 2.0; // mm
-    const maxWindSpeed = 15.0; // m/s
-    const tempRangeMin = -10.0; // °C
-    const tempRangeMax = 40.0; // °C
-
-    // Check temperature range
-    if (temp < tempRangeMin || temp > tempRangeMax) {
-      return false;
-    }
-
-    // Check wind speed
-    if (windSpeed > maxWindSpeed) {
-      return false;
-    }
-
-    // Check precipitation
-    if ((weather.current.precipitation ?? 0) > precipitationThreshold) {
-      return false;
-    }
-
-    return true;
-  }
-
-  /// Get flight suitability message
-  String get flightSuitabilityMessage {
-    if (!isSuitableForFlight) {
-      return 'Current conditions are not suitable for drone flight';
-    }
-    return 'Conditions are suitable for drone flight';
   }
 
   // Private helper methods
