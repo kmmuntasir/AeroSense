@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <!-- Cloud -->
+  <path d="M50 28H18C12.48 28 8 23.52 8 18C8 13.04 11.6 8.9 16.36 8.12C17.8 3.44 22.08 0 27.2 0C33.16 0 38 4.84 38 10.8V11C38 11 38.4 11 38.8 11C44.04 11.24 48.2 15.56 48 20.8C47.84 24.8 45.28 28 42 28H50Z" fill="#94A3B8" transform="translate(0,4)"/>
+  <!-- Snowflakes -->
+  <!-- Flake 1 -->
+  <line x1="20" y1="42" x2="20" y2="54" stroke="#BAE6FD" stroke-width="2" stroke-linecap="round"/>
+  <line x1="14" y1="48" x2="26" y2="48" stroke="#BAE6FD" stroke-width="2" stroke-linecap="round"/>
+  <line x1="15.76" y1="43.76" x2="24.24" y2="52.24" stroke="#BAE6FD" stroke-width="2" stroke-linecap="round"/>
+  <line x1="24.24" y1="43.76" x2="15.76" y2="52.24" stroke="#BAE6FD" stroke-width="2" stroke-linecap="round"/>
+  <!-- Flake 2 -->
+  <line x1="44" y1="42" x2="44" y2="54" stroke="#BAE6FD" stroke-width="2" stroke-linecap="round"/>
+  <line x1="38" y1="48" x2="50" y2="48" stroke="#BAE6FD" stroke-width="2" stroke-linecap="round"/>
+  <line x1="39.76" y1="43.76" x2="48.24" y2="52.24" stroke="#BAE6FD" stroke-width="2" stroke-linecap="round"/>
+  <line x1="48.24" y1="43.76" x2="39.76" y2="52.24" stroke="#BAE6FD" stroke-width="2" stroke-linecap="round"/>
+  <!-- Flake 3 (small, center) -->
+  <line x1="32" y1="54" x2="32" y2="62" stroke="#BAE6FD" stroke-width="2" stroke-linecap="round"/>
+  <line x1="28" y1="58" x2="36" y2="58" stroke="#BAE6FD" stroke-width="2" stroke-linecap="round"/>
+</svg>

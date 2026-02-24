@@ -11,6 +11,7 @@ import '../presentation/controllers/forecast_details_controller.dart';
 import '../presentation/controllers/weather_alerts_controller.dart';
 import '../presentation/bindings/onboarding_binding.dart';
 import '../presentation/bindings/main_shell_binding.dart';
+import '../presentation/bindings/dashboard_binding.dart';
 import '../core/bindings/location_binding.dart';
 import '../core/bindings/settings_binding.dart';
 
@@ -86,7 +87,7 @@ class AppPages {
     GetPage(
       name: '/dashboard',
       page: () => const DashboardPage(),
-      binding: LocationBinding(),
+      binding: DashboardBinding(),
       transition: Transition.cupertino,
     ),
   ];

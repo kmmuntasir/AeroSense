@@ -12,6 +12,9 @@ class LocationController extends GetxController {
 
   // Reactive variables
   final Rx<Position?> _currentPosition = Rx<Position?>(null);
+  final Rx<GeocodingResult?> _currentGeocodingResult = Rx<GeocodingResult?>(
+    null,
+  );
   final RxList<GeocodingResult> _savedLocations = RxList<GeocodingResult>([]);
   final RxBool _isLoading = RxBool(false);
   final RxString _errorMessage = RxString('');
@@ -122,12 +125,31 @@ class LocationController extends GetxController {
 
       _currentPosition.value = position;
       _errorMessage.value = '';
+
+      // Reverse geocode in the background — updates city name once resolved.
+      _reverseGeocodePosition(position.latitude, position.longitude);
+
       return true;
     } catch (e) {
       _errorMessage.value = 'Failed to get current location: ${e.toString()}';
       return false;
     } finally {
       _isLoading.value = false;
+    }
+  }
+
+  Future<void> _reverseGeocodePosition(
+    double latitude,
+    double longitude,
+  ) async {
+    try {
+      final result = await _geocodingProvider.reverseGeocode(
+        latitude: latitude,
+        longitude: longitude,
+      );
+      _currentGeocodingResult.value = result;
+    } catch (_) {
+      // Non-critical — fall back to "Current Location"
     }
   }
 
@@ -220,13 +242,20 @@ class LocationController extends GetxController {
         .toList();
   }
 
-  /// Get current location as GeocodingResult
+  /// Returns the current location as a [GeocodingResult].
+  /// Uses the reverse-geocoded city name once available; falls back to
+  /// "Current Location" while the reverse geocode is still in flight.
   GeocodingResult? get currentLocationAsGeocodingResult {
-    if (_currentPosition.value == null) return null;
+    // Reading both reactive vars so Obx() rebuilds when either changes.
+    final geocoded = _currentGeocodingResult.value;
+    final position = _currentPosition.value;
+
+    if (position == null) return null;
+    if (geocoded != null) return geocoded;
 
     return GeocodingResult(
-      latitude: _currentPosition.value!.latitude,
-      longitude: _currentPosition.value!.longitude,
+      latitude: position.latitude,
+      longitude: position.longitude,
       name: 'Current Location',
       country: '',
       countryCode: '',
@@ -236,6 +265,7 @@ class LocationController extends GetxController {
   /// Clear current location
   void clearCurrentLocation() {
     _currentPosition.value = null;
+    _currentGeocodingResult.value = null;
     _errorMessage.value = '';
   }
 

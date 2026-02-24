@@ -1,12 +1,16 @@
 import 'package:aero_sense/core/models/weather_response.dart';
 import 'package:aero_sense/core/services/api_client.dart';
+import 'package:aero_sense/core/services/geocoding_provider.dart';
 import 'package:aero_sense/core/models/geocoding_response.dart';
 
 class WeatherProvider {
   final ApiClient _apiClient;
+  final GeocodingProvider _geocodingProvider;
   static const String _weatherPath = '/v1/forecast';
 
-  WeatherProvider() : _apiClient = ApiClient();
+  WeatherProvider()
+    : _apiClient = ApiClient(),
+      _geocodingProvider = GeocodingProvider();
 
   Future<WeatherResponse> getCurrentWeather({
     required double latitude,
@@ -15,6 +19,7 @@ class WeatherProvider {
     String? timezone = 'auto',
     List<String>? variables = const [
       'temperature_2m',
+      'apparent_temperature',
       'relative_humidity_2m',
       'wind_speed_10m',
       'wind_direction_10m',
@@ -64,6 +69,7 @@ class WeatherProvider {
     required String locationName,
     List<String>? variables = const [
       'temperature_2m',
+      'apparent_temperature',
       'relative_humidity_2m',
       'wind_speed_10m',
       'wind_direction_10m',
@@ -98,36 +104,15 @@ class WeatherProvider {
     }
   }
 
-  Future<List<GeocodingResult>> searchLocation(String query) async {
-    try {
-      final response = await _apiClient.get(
-        '/v1/geocoding',
-        queryParameters: {
-          'name': query,
-          'count': '10',
-          'language': 'en',
-          'format': 'json',
-        },
-      );
-
-      final data = response.data;
-      if (data == null) {
-        throw ApiException('Empty response from geocoding API');
-      }
-
-      return GeocodingResponse.fromJson(data).results;
-    } catch (e) {
-      if (e is ApiException) {
-        rethrow;
-      }
-      throw ApiException('Failed to search location: ${e.toString()}');
-    }
+  Future<List<GeocodingResult>> searchLocation(String query) {
+    return _geocodingProvider.searchLocation(query: query);
   }
 
   Future<List<WeatherResponse>> getMultipleWeatherLocations({
     required List<String> locationNames,
     List<String>? variables = const [
       'temperature_2m',
+      'apparent_temperature',
       'relative_humidity_2m',
       'wind_speed_10m',
       'wind_direction_10m',

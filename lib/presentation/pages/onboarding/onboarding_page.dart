@@ -1,5 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:permission_handler/permission_handler.dart';
+import '../../../core/controllers/location_controller.dart';
+
+/// OnboardingPage handles the first-launch experience.
+/// It shows a loading state while checking location permission,
+/// then routes the user appropriately:
+/// - Location granted: Navigate to Dashboard
+/// - Location denied: Navigate to Search/Fallback view
+//class OnboardingPage extends StatefulWidget {
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/constants/app_assets.dart';
 import '../../../core/constants/app_colors.dart';
@@ -70,6 +79,51 @@ class _OnboardingProgressDots extends StatelessWidget {
   }
 }
 
+  /*Future<void> _initializeOnboarding() async {
+    // Read the real permission status directly — avoids a race condition
+    // with LocationController._checkLocationPermission() (not awaited in onInit).
+    final status = await Permission.location.status;
+
+    if (status.isPermanentlyDenied) {
+      if (mounted) Get.offAllNamed('/search');
+      return;
+    }
+
+    // Request permission (no-op / returns current status if already granted)
+    final granted = await _locationController.requestLocationPermission();
+    if (!granted) {
+      if (mounted) Get.offAllNamed('/search');
+      return;
+    }
+
+    final success = await _locationController.getCurrentLocation();
+    if (mounted) {
+      Get.offAllNamed(success ? '/dashboard' : '/search');
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    return Scaffold(
+      backgroundColor: isDark
+          ? const Color(0xFF121212)
+          : const Color(0xFFF8F9FA),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // Sky Indigo weather icon (sun/cloud)
+            Container(
+              width: 120,
+              height: 120,
+              decoration: BoxDecoration(
+                color: const Color(0xFF4A90E2),
+                borderRadius: BorderRadius.circular(24),
+              ),
+              child: const Icon(Icons.cloud, size: 64, color: Colors.white),*/
 class _OnboardingPrimaryButton extends StatelessWidget {
   final String label;
   final IconData icon;

@@ -113,6 +113,7 @@ class WeatherResponse {
 class CurrentWeather {
   final DateTime time;
   final double? temperature2M;
+  final double? apparentTemperature;
   final double? relativeHumidity2M;
   final double? windSpeed10M;
   final double? windDirection10M;
@@ -122,6 +123,7 @@ class CurrentWeather {
   CurrentWeather({
     required this.time,
     this.temperature2M,
+    this.apparentTemperature,
     this.relativeHumidity2M,
     this.windSpeed10M,
     this.windDirection10M,
@@ -133,6 +135,7 @@ class CurrentWeather {
     return CurrentWeather(
       time: DateTime.parse(json['time'] ?? DateTime.now().toIso8601String()),
       temperature2M: (json['temperature_2m'] as num?)?.toDouble(),
+      apparentTemperature: (json['apparent_temperature'] as num?)?.toDouble(),
       relativeHumidity2M: (json['relative_humidity_2m'] as num?)?.toDouble(),
       windSpeed10M: (json['wind_speed_10m'] as num?)?.toDouble(),
       windDirection10M: (json['wind_direction_10m'] as num?)?.toDouble(),
@@ -145,6 +148,7 @@ class CurrentWeather {
     return {
       'time': time.toIso8601String(),
       'temperature_2m': temperature2M,
+      'apparent_temperature': apparentTemperature,
       'relative_humidity_2m': relativeHumidity2M,
       'wind_speed_10m': windSpeed10M,
       'wind_direction_10m': windDirection10M,

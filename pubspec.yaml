@@ -48,6 +48,7 @@ dependencies:
   # Local Storage
   get_storage: ^2.1.1
 
+  # SVG Rendering
   # Fonts
   google_fonts: ^6.2.1
 
