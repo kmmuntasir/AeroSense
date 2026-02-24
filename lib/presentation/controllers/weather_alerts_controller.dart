@@ -1,3 +1,5 @@
+import 'package:aero_sense/core/models/weather_alert_response.dart';
+import 'package:aero_sense/core/services/alerts_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -14,22 +16,74 @@ class PastAlert {
 }
 
 /// Controller for the Weather Alerts page.
-/// Uses static mock data matching the design.
+/// Manages weather alerts fetched from network.
 class WeatherAlertsController extends GetxController {
-  // Active alert
-  final String alertType = 'ACTIVE WARNING';
-  final String alertTitle = 'Severe Thunderstorm';
-  final String alertLocation = 'San Francisco, CA';
-  final String alertUntil = 'Until 6:00 PM';
-  final String alertDescription =
-      'Expect high winds, heavy rain, and possible hail. '
-      'Seek shelter immediately and stay away from windows.';
-  final String nwsSource = 'NATIONAL WEATHER SERVICE';
-  final String nwsPreview =
-      'A line of severe thunderstorms will move east at '
-      '45 mph. Wind gusts up to 60 mph are likely...';
+  // Dependencies
+  final AlertsProvider _alertsProvider = AlertsProvider();
 
-  final RxBool isExpanded = false.obs;
+  // Alert location coordinates (San Francisco, CA)
+  final double alertLatitude = 37.7749;
+  final double alertLongitude = -122.4194;
+
+  // Reactive variables
+  final Rx<WeatherAlert?> _activeAlert = Rx<WeatherAlert?>(null);
+  final RxList<WeatherAlert> _allAlerts = <WeatherAlert>[].obs;
+  final RxBool _isLoading = RxBool(false);
+  final RxString _errorMessage = RxString('');
+  final RxBool isExpanded = RxBool(false);
+
+  // Getters
+  WeatherAlert? get activeAlert => _activeAlert.value;
+  List<WeatherAlert> get allAlerts => _allAlerts;
+  bool get isLoading => _isLoading.value;
+  String get errorMessage => _errorMessage.value;
+
+  // Legacy getters for UI compatibility
+  String get alertType => _activeAlert.value != null ? 'ACTIVE WARNING' : '';
+  String get alertTitle => _activeAlert.value?.title ?? '';
+  String get alertLocation => _activeAlert.value?.location ?? '';
+  String get alertUntil => _activeAlert.value?.timeRemaining ?? '';
+  String get alertDescription => _activeAlert.value?.description ?? '';
+  String get nwsSource => _activeAlert.value?.source ?? 'NATIONAL WEATHER SERVICE';
+  String get nwsPreview => _activeAlert.value?.description ?? '';
+
+  @override
+  void onInit() {
+    super.onInit();
+    fetchAlerts();
+  }
+
+  /// Fetch alerts from network
+  Future<void> fetchAlerts() async {
+    _isLoading.value = true;
+    _errorMessage.value = '';
+
+    try {
+      final alerts = await _alertsProvider.getMockAlerts(
+        latitude: alertLatitude,
+        longitude: alertLongitude,
+        location: 'San Francisco, CA',
+      );
+
+      if (alerts.isEmpty) {
+        _activeAlert.value = null;
+        _allAlerts.value = [];
+        _errorMessage.value = 'No alerts available for this location';
+      } else {
+        _activeAlert.value = alerts.first;
+        _allAlerts.value = alerts;
+      }
+    } catch (e) {
+      _errorMessage.value = 'Failed to fetch alerts: ${e.toString()}';
+      _activeAlert.value = null;
+      _allAlerts.value = [];
+    } finally {
+      _isLoading.value = false;
+    }
+  }
+
+  /// Refresh alerts
+  Future<void> refreshAlerts() => fetchAlerts();
 
   void toggleExpand() => isExpanded.toggle();
 
