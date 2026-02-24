@@ -46,7 +46,8 @@ class WeatherAlertsController extends GetxController {
   String get alertLocation => _activeAlert.value?.location ?? '';
   String get alertUntil => _activeAlert.value?.timeRemaining ?? '';
   String get alertDescription => _activeAlert.value?.description ?? '';
-  String get nwsSource => _activeAlert.value?.source ?? 'NATIONAL WEATHER SERVICE';
+  String get nwsSource =>
+      _activeAlert.value?.source ?? 'NATIONAL WEATHER SERVICE';
   String get nwsPreview => _activeAlert.value?.description ?? '';
 
   @override
@@ -104,7 +105,6 @@ class WeatherAlertsController extends GetxController {
       final alerts = await _alertsProvider.getMockAlerts(
         latitude: position.latitude,
         longitude: position.longitude,
-        location: 'Your Location',
       );
 
       if (alerts.isEmpty) {

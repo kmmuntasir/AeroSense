@@ -21,22 +21,20 @@ class WeatherAlertsPage extends GetView<WeatherAlertsController> {
       ),
       body: Obx(
         () => controller.isLoading
-            ? const Center(child: CircularProgressIndicator())
+            ? const Center(child: CircularProgressIndicator.adaptive())
             : controller.errorMessage.isNotEmpty
-                ? _ErrorState(errorMessage: controller.errorMessage)
-                : ListView(
-                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
-                    children: [
-                      if (controller.activeAlert != null)
-                        _ActiveWarningCard(controller: controller)
-                      else
-                        _NoAlertsState(),
-                      const SizedBox(height: 28),
-                      _PastAlertsSection(alerts: controller.pastAlerts),
-                      const SizedBox(height: 24),
-                      _ManageNotificationsLink(),
-                    ],
-                  ),
+            ? _ErrorState(errorMessage: controller.errorMessage)
+            : ListView(
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
+                children: [
+                  if (controller.activeAlert != null)
+                    _ActiveWarningCard(controller: controller)
+                  else
+                    _NoAlertsState(),
+                  const SizedBox(height: 28),
+                  _PastAlertsSection(alerts: controller.pastAlerts),
+                ],
+              ),
       ),
     );
   }
@@ -416,80 +414,55 @@ class _PastAlertRow extends StatelessWidget {
     final cs = Theme.of(context).colorScheme;
     final tt = Theme.of(context).textTheme;
 
-    return Card(
-      elevation: 1.5,
-      shape: RoundedRectangleBorder(
+    return Container(
+      decoration: BoxDecoration(
+        color: cs.surface,
         borderRadius: BorderRadius.circular(AppConstants.cardRadius),
+        boxShadow: [
+          BoxShadow(
+            color: cs.shadow.withValues(alpha: 0.08),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        child: Row(
-          children: [
-            Container(
-              width: 36,
-              height: 36,
-              decoration: BoxDecoration(
-                color: cs.surfaceContainer,
-                shape: BoxShape.circle,
-              ),
-              child: Icon(alert.icon, size: 18, color: cs.onSurfaceVariant),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    alert.title,
-                    style: tt.bodyLarge?.copyWith(fontWeight: FontWeight.w500),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    alert.location,
-                    style: tt.bodySmall?.copyWith(color: cs.onSurfaceVariant),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(width: 8),
-            Text(
-              'Expired',
-              style: tt.labelSmall?.copyWith(
-                color: cs.onSurfaceVariant,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// ── Manage Notifications Link ─────────────────────────────────────────────────
-
-class _ManageNotificationsLink extends StatelessWidget {
-  const _ManageNotificationsLink();
-
-  @override
-  Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-    final tt = Theme.of(context).textTheme;
-
-    return GestureDetector(
-      onTap: () {},
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
         children: [
+          Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(
+              color: cs.surfaceContainer,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(alert.icon, size: 18, color: cs.onSurfaceVariant),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  alert.title,
+                  style: tt.bodyLarge?.copyWith(fontWeight: FontWeight.w500),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  alert.location,
+                  style: tt.bodySmall?.copyWith(color: cs.onSurfaceVariant),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
           Text(
-            'Manage Alert Notifications',
-            style: tt.bodyMedium?.copyWith(
-              color: cs.primary,
+            'Expired',
+            style: tt.labelSmall?.copyWith(
+              color: cs.onSurfaceVariant,
               fontWeight: FontWeight.w500,
             ),
           ),
-          const SizedBox(width: 4),
-          Icon(Icons.arrow_forward, size: 16, color: cs.primary),
         ],
       ),
     );
@@ -528,7 +501,8 @@ class _ErrorState extends StatelessWidget {
             ),
             const SizedBox(height: 24),
             ElevatedButton.icon(
-              onPressed: () => Get.find<WeatherAlertsController>().refreshAlerts(),
+              onPressed: () =>
+                  Get.find<WeatherAlertsController>().refreshAlerts(),
               icon: const Icon(Icons.refresh),
               label: const Text('Retry'),
             ),
