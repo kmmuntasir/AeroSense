@@ -7,11 +7,13 @@ import '../presentation/pages/settings/settings_page.dart';
 import '../presentation/pages/shell/main_shell_page.dart';
 import '../presentation/pages/forecast_details/forecast_details_page.dart';
 import '../presentation/pages/weather_alerts/weather_alerts_page.dart';
+import '../presentation/pages/locations/locations_page.dart';
 import '../presentation/controllers/forecast_details_controller.dart';
 import '../presentation/controllers/weather_alerts_controller.dart';
 import '../presentation/bindings/onboarding_binding.dart';
 import '../presentation/bindings/main_shell_binding.dart';
 import '../presentation/bindings/dashboard_binding.dart';
+import '../presentation/bindings/locations_binding.dart';
 import '../core/bindings/location_binding.dart';
 import '../core/bindings/settings_binding.dart';
 
@@ -88,6 +90,14 @@ class AppPages {
       name: '/dashboard',
       page: () => const DashboardPage(),
       binding: DashboardBinding(),
+      transition: Transition.cupertino,
+    ),
+
+    // Locations hub - saved cities + current location
+    GetPage(
+      name: '/locations',
+      page: () => const LocationsPage(),
+      binding: LocationsBinding(),
       transition: Transition.cupertino,
     ),
   ];

@@ -1,15 +1,18 @@
-import 'package:aero_sense/core/controllers/location_controller.dart';
-import 'package:aero_sense/core/controllers/weather_controller.dart';
-import 'package:aero_sense/core/models/geocoding_response.dart';
-import 'package:aero_sense/presentation/widgets/dashboard/air_quality_card.dart';
-import 'package:aero_sense/presentation/widgets/dashboard/current_weather_hero.dart';
-import 'package:aero_sense/presentation/widgets/dashboard/daily_forecast_list.dart';
-import 'package:aero_sense/presentation/widgets/dashboard/hourly_forecast_list.dart';
-import 'package:aero_sense/presentation/widgets/dashboard/humidity_card.dart';
-import 'package:aero_sense/presentation/widgets/dashboard/insights_card.dart';
-import 'package:aero_sense/presentation/widgets/dashboard/wind_card.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:aero_sense/core/controllers/weather_controller.dart';
+import 'package:aero_sense/core/controllers/location_controller.dart';
+import 'package:aero_sense/core/models/geocoding_response.dart';
+import 'package:aero_sense/presentation/widgets/dashboard/current_weather_hero.dart';
+import 'package:aero_sense/presentation/widgets/dashboard/insights_card.dart';
+import 'package:aero_sense/presentation/widgets/dashboard/hourly_forecast_list.dart';
+import 'package:aero_sense/presentation/widgets/dashboard/daily_forecast_list.dart';
+import 'package:aero_sense/presentation/widgets/dashboard/air_quality_card.dart';
+import 'package:aero_sense/presentation/widgets/dashboard/wind_card.dart';
+import 'package:aero_sense/presentation/widgets/dashboard/humidity_card.dart';
+import 'package:aero_sense/presentation/pages/locations/locations_page.dart';
+
+// ── Shell ─────────────────────────────────────────────────────────────────────
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -19,11 +22,50 @@ class DashboardPage extends StatefulWidget {
 }
 
 class _DashboardPageState extends State<DashboardPage> {
+  int _selectedNavIndex = 0;
+
+  void _onNavTap(int index) {
+    if (index == _selectedNavIndex) return;
+    switch (index) {
+      case 2:
+        // TODO: Navigate to Alerts (Task 11)
+        break;
+      case 3:
+        // TODO: Navigate to Settings (Task 10)
+        break;
+      default:
+        setState(() => _selectedNavIndex = index);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: IndexedStack(
+        index: _selectedNavIndex,
+        children: const [_DashboardTab(), LocationsPage()],
+      ),
+      bottomNavigationBar: _DashboardBottomNav(
+        selectedIndex: _selectedNavIndex,
+        onTap: _onNavTap,
+      ),
+    );
+  }
+}
+
+// ── Dashboard tab ─────────────────────────────────────────────────────────────
+
+class _DashboardTab extends StatefulWidget {
+  const _DashboardTab();
+
+  @override
+  State<_DashboardTab> createState() => _DashboardTabState();
+}
+
+class _DashboardTabState extends State<_DashboardTab> {
   late final WeatherController _weatherController;
   late final LocationController _locationController;
   late final GeocodingResult? _location;
-
-  int _selectedNavIndex = 0;
 
   @override
   void initState() {
@@ -36,33 +78,17 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 
   void _fetchWeather() {
-    if (_weatherController.currentWeather != null) return;
-
     if (_location != null) {
+      // Explicit city selected from search — clear stale data then fetch fresh.
+      _weatherController.clearCurrentWeather();
       _weatherController.fetchWeatherForLocation(
         latitude: _location.latitude,
         longitude: _location.longitude,
         locationName: _location.name,
       );
-    } else {
+    } else if (_weatherController.currentWeather == null) {
+      // GPS-based — only fetch if no data exists yet.
       _weatherController.fetchCurrentWeather();
-    }
-  }
-
-  void _onNavTap(int index) {
-    if (index == _selectedNavIndex) return;
-
-    switch (index) {
-      case 1:
-        Get.toNamed('/search');
-      case 2:
-        Get.toNamed('/weather-alerts');
-        break;
-      case 3:
-        Get.toNamed('/settings');
-        break;
-      default:
-        setState(() => _selectedNavIndex = index);
     }
   }
 
@@ -76,10 +102,11 @@ class _DashboardPageState extends State<DashboardPage> {
         elevation: 0,
         automaticallyImplyLeading: false,
         title: Obx(() {
-          final name =
-              _location?.name ??
-              _locationController.currentLocationAsGeocodingResult?.name ??
-              'AeroSense';
+          // Always read the reactive GPS name so Obx keeps its subscription
+          // even when _location is non-null (avoids "improper use" warning).
+          final gpsName =
+              _locationController.currentLocationAsGeocodingResult?.name;
+          final name = _location?.name ?? gpsName ?? 'AeroSense';
           return Row(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -142,13 +169,11 @@ class _DashboardPageState extends State<DashboardPage> {
           ),
         );
       }),
-      bottomNavigationBar: _DashboardBottomNav(
-        selectedIndex: _selectedNavIndex,
-        onTap: _onNavTap,
-      ),
     );
   }
 }
+
+// ── Bottom nav ────────────────────────────────────────────────────────────────
 
 class _DashboardBottomNav extends StatelessWidget {
   const _DashboardBottomNav({required this.selectedIndex, required this.onTap});
@@ -182,9 +207,9 @@ class _DashboardBottomNav extends StatelessWidget {
             label: 'Dashboard',
           ),
           NavigationDestination(
-            icon: Icon(Icons.search),
-            selectedIcon: Icon(Icons.search),
-            label: 'Search',
+            icon: Icon(Icons.location_on_outlined),
+            selectedIcon: Icon(Icons.location_on),
+            label: 'Locations',
           ),
           NavigationDestination(
             icon: Icon(Icons.notifications_outlined),
@@ -201,6 +226,8 @@ class _DashboardBottomNav extends StatelessWidget {
     );
   }
 }
+
+// ── Error view ────────────────────────────────────────────────────────────────
 
 class _ErrorView extends StatelessWidget {
   const _ErrorView({required this.message, required this.onRetry});

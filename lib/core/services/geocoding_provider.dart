@@ -116,7 +116,7 @@ class GeocodingProvider {
         name: name,
         country: country,
         countryCode: countryCode,
-        state: state,
+        admin1: state,
       );
     } catch (e) {
       if (e is ApiException) rethrow;
@@ -124,7 +124,7 @@ class GeocodingProvider {
     }
   }
 
-  /// Kept for API compatibility; delegates to [reverseGeocode].
+  /// Delegates to [reverseGeocode] and wraps the result in a list.
   Future<List<GeocodingResult>> searchByCoordinates({
     required double latitude,
     required double longitude,
@@ -133,24 +133,13 @@ class GeocodingProvider {
     String? format = 'json',
   }) async {
     try {
-      final results = await searchByCoordinates(
+      final result = await reverseGeocode(
         latitude: latitude,
         longitude: longitude,
-        count: 1,
-        language: language,
       );
-
-      if (results.isEmpty) {
-        throw ApiException(
-          'No location found for coordinates: $latitude, $longitude',
-        );
-      }
-
-      return results;
+      return [result];
     } catch (e) {
-      if (e is ApiException) {
-        rethrow;
-      }
+      if (e is ApiException) rethrow;
       throw ApiException('Failed to reverse geocode: ${e.toString()}');
     }
   }
