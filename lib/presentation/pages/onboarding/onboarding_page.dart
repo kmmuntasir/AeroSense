@@ -14,7 +14,7 @@ class OnboardingPage extends StatelessWidget {
     final controller = Get.find<OnboardingController>();
     return Scaffold(
       // Steps 2 & 3 use #F6F6F8; Step 1 is #F6F7F8 — diff is 1 green unit, undetectable
-      backgroundColor: const Color(0xFFF6F6F8),
+      backgroundColor: AppColors.pageBackground,
       body: SafeArea(
         child: PageView(
           controller: controller.pageController,
@@ -90,7 +90,7 @@ class _OnboardingPrimaryButton extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: 342,
+        width: double.infinity,
         height: 56,
         decoration: BoxDecoration(
           color: color,
@@ -209,7 +209,7 @@ class _LocationPage extends StatelessWidget {
                   child: Center(
                     child: FittedBox(
                       fit: BoxFit.scaleDown,
-                      child: _LocationIllustration(),
+                      child: const _LocationIllustration(),
                     ),
                   ),
                 ),
@@ -273,6 +273,8 @@ class _LocationPage extends StatelessWidget {
 }
 
 class _LocationIllustration extends StatelessWidget {
+  const _LocationIllustration();
+
   @override
   Widget build(BuildContext context) {
     return SizedBox(
@@ -347,7 +349,7 @@ class _NotificationsPage extends StatelessWidget {
                   child: Center(
                     child: FittedBox(
                       fit: BoxFit.scaleDown,
-                      child: _NotificationsIllustration(),
+                      child: const _NotificationsIllustration(),
                     ),
                   ),
                 ),
@@ -410,6 +412,8 @@ class _NotificationsPage extends StatelessWidget {
 }
 
 class _NotificationsIllustration extends StatelessWidget {
+  const _NotificationsIllustration();
+
   @override
   Widget build(BuildContext context) {
     // img_notifications_illustration.png — Figma node 10:214 (256×256 PNG)
@@ -493,9 +497,9 @@ class _GetStartedPage extends StatelessWidget {
               end: Alignment.bottomCenter,
               stops: const [0, 0.5, 1],
               colors: [
-                const Color(0xFFF6F6F8).withValues(alpha: 0),
-                const Color(0xFFF6F6F8),
-                const Color(0xFFF6F6F8),
+                AppColors.pageBackground.withValues(alpha: 0),
+                AppColors.pageBackground,
+                AppColors.pageBackground,
               ],
             ),
           ),

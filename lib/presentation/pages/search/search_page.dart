@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -62,6 +64,7 @@ class _SearchPageState extends State<SearchPage> {
   final RxBool _isSearching = RxBool(false);
   final RxBool _hasText = RxBool(false);
   final RxBool _showingDefaults = RxBool(true);
+  Timer? _debounceTimer;
 
   @override
   void initState() {
@@ -76,12 +79,15 @@ class _SearchPageState extends State<SearchPage> {
 
   @override
   void dispose() {
+    _debounceTimer?.cancel();
     _searchController.dispose();
     _focusNode.dispose();
     super.dispose();
   }
 
-  Future<void> _onSearchChanged(String query) async {
+  void _onSearchChanged(String query) {
+    _debounceTimer?.cancel();
+
     if (query.trim().isEmpty) {
       _searchResults.value = List.of(_defaultLocations);
       _isSearching.value = false;
@@ -108,13 +114,17 @@ class _SearchPageState extends State<SearchPage> {
       return;
     }
 
-    // No local match — fall through to real API with debounce
+    // No local match — fall through to real API with cancellable debounce
     _isSearching.value = true;
-    final snapshot = query;
-    await Future.delayed(const Duration(milliseconds: 500));
-    if (_searchController.text != snapshot) return;
+    _debounceTimer = Timer(
+      const Duration(milliseconds: 500),
+      () => _fetchRemote(query),
+    );
+  }
 
+  Future<void> _fetchRemote(String query) async {
     final results = await _locationController.searchLocation(query);
+    if (!mounted || _searchController.text.trim() != query.trim()) return;
     _searchResults.value = results;
     _isSearching.value = false;
   }
@@ -124,6 +134,7 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   void _clearSearch() {
+    _debounceTimer?.cancel();
     _searchController.clear();
     _searchResults.value = List.of(_defaultLocations);
     _isSearching.value = false;
@@ -133,7 +144,7 @@ class _SearchPageState extends State<SearchPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF6F6F8),
+      backgroundColor: AppColors.pageBackground,
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -294,7 +305,7 @@ class _SearchPageState extends State<SearchPage> {
                 return ListView.separated(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
                   itemCount: _searchResults.length,
-                  separatorBuilder: (_, _) => const SizedBox(height: 8),
+                  separatorBuilder: (context, index) => const SizedBox(height: 8),
                   itemBuilder: (context, index) {
                     final location = _searchResults[index];
                     return _SearchResultTile(

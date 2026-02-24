@@ -13,4 +13,5 @@ class AppColors {
   static const Color progressDotInactive = Color(0x332B3BEE);
   static const Color searchBarBackground = Color(0xFFEDEDED);
   static const Color countryCode = Color(0xFF94A3B8);
+  static const Color pageBackground = Color(0xFFF6F6F8);
 }
