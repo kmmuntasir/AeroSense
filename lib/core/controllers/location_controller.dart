@@ -22,7 +22,7 @@ class LocationController extends GetxController {
 
   // Getters
   Position? get currentPosition => _currentPosition.value;
-  List<GeocodingResult> get savedLocations => _savedLocations;
+  RxList<GeocodingResult> get savedLocations => _savedLocations;
   bool get isLoading => _isLoading.value;
   String get errorMessage => _errorMessage.value;
   bool get hasPermission => _hasPermission.value;

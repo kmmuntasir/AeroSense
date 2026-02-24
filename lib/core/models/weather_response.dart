@@ -2,6 +2,7 @@ class WeatherResponse {
   final double latitude;
   final double longitude;
   final double elevation;
+  final double? utcOffsetSeconds;
   final CurrentWeather current;
   final List<HourlyWeather> hourly;
   final List<DailyWeather> daily;
@@ -10,6 +11,7 @@ class WeatherResponse {
     required this.latitude,
     required this.longitude,
     required this.elevation,
+    this.utcOffsetSeconds,
     required this.current,
     required this.hourly,
     required this.daily,
@@ -20,6 +22,7 @@ class WeatherResponse {
       latitude: json['latitude']?.toDouble() ?? 0.0,
       longitude: json['longitude']?.toDouble() ?? 0.0,
       elevation: json['elevation']?.toDouble() ?? 0.0,
+      utcOffsetSeconds: (json['utc_offset_seconds'] as num?)?.toDouble(),
       current: CurrentWeather.fromJson(json['current'] ?? {}),
       hourly:
           (json['hourly']?['time'] as List?)
@@ -85,6 +88,7 @@ class WeatherResponse {
       'latitude': latitude,
       'longitude': longitude,
       'elevation': elevation,
+      'utc_offset_seconds': utcOffsetSeconds,
       'current': current.toJson(),
       'hourly': {
         'time': hourly.map((h) => h.time.toIso8601String()).toList(),

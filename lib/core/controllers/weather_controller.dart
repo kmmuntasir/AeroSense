@@ -240,19 +240,18 @@ class WeatherController extends GetxController {
   /// Fetch current weather for the current location
   Future<bool> fetchCurrentWeather() async {
     try {
+      _isLoading.value = true;
+      _errorMessage.value = '';
+
       if (_locationController.currentPosition == null) {
         final located = await _locationController.getCurrentLocation();
         if (!located || _locationController.currentPosition == null) {
-          _errorMessage.value =
-              _locationController.errorMessage.isNotEmpty
-                  ? _locationController.errorMessage
-                  : 'Please enable location services first';
+          _errorMessage.value = _locationController.errorMessage.isNotEmpty
+              ? _locationController.errorMessage
+              : 'Please enable location services first';
           return false;
         }
       }
-
-      _isLoading.value = true;
-      _errorMessage.value = '';
 
       final position = _locationController.currentPosition!;
       await _fetchWeatherAndAqi(
@@ -274,7 +273,7 @@ class WeatherController extends GetxController {
   Future<bool> fetchWeatherForLocation({
     required double latitude,
     required double longitude,
-    String? locationName,
+    String? locationKey,
   }) async {
     try {
       _isLoading.value = true;
@@ -282,13 +281,12 @@ class WeatherController extends GetxController {
 
       await _fetchWeatherAndAqi(latitude: latitude, longitude: longitude);
 
-      // Also persist in saved-weather map
-      final locationKey =
-          locationName ??
+      final key =
+          locationKey ??
           '${latitude.toStringAsFixed(2)},${longitude.toStringAsFixed(2)}';
       _savedWeatherData.value = {
         ..._savedWeatherData.value,
-        locationKey: _currentWeather.value!,
+        if (_currentWeather.value != null) key: _currentWeather.value!,
       };
       _saveWeatherDataToStorage();
 
@@ -303,6 +301,24 @@ class WeatherController extends GetxController {
     }
   }
 
+  /// Fetch weather for explicit coordinates without touching [_currentWeather].
+  /// Used by the Locations page current-location card.
+  Future<WeatherResponse?> fetchWeatherForCoordinates({
+    required double latitude,
+    required double longitude,
+    double? elevation,
+  }) async {
+    try {
+      return await _weatherProvider.getCurrentWeather(
+        latitude: latitude,
+        longitude: longitude,
+        elevation: elevation,
+      );
+    } catch (_) {
+      return null;
+    }
+  }
+
   /// Fetch weather for multiple saved locations.
   Future<void> fetchWeatherForSavedLocations() async {
     try {
@@ -310,20 +326,33 @@ class WeatherController extends GetxController {
       _errorMessage.value = '';
 
       final locations = _locationController.savedLocations;
-      final results = await _weatherProvider.getMultipleWeatherLocations(
-        locationNames: locations.map((loc) => loc.formattedLocation).toList(),
+      final newData = Map<String, WeatherResponse>.from(
+        _savedWeatherData.value,
       );
 
-      for (int i = 0; i < locations.length; i++) {
-        if (i < results.length) {
-          final locationKey = locations[i].formattedLocation;
-          _savedWeatherData.value = {
-            ..._savedWeatherData.value,
-            locationKey: results[i],
-          };
+      for (final loc in locations) {
+        try {
+          final weather = await _weatherProvider.getCurrentWeather(
+            latitude: loc.latitude,
+            longitude: loc.longitude,
+            elevation: loc.elevation,
+            variables: const [
+              'temperature_2m',
+              'apparent_temperature',
+              'relative_humidity_2m',
+              'wind_speed_10m',
+              'wind_direction_10m',
+              'precipitation',
+              'weather_code',
+            ],
+          );
+          newData[loc.formattedLocation] = weather;
+        } catch (_) {
+          // Skip failed location; existing cached data is preserved.
         }
       }
 
+      _savedWeatherData.value = newData;
       _saveWeatherDataToStorage();
       _errorMessage.value = '';
     } catch (e) {

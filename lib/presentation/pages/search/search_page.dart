@@ -284,7 +284,10 @@ class _SearchPageState extends State<SearchPage> {
                     children: [
                       const Padding(
                         padding: EdgeInsets.symmetric(horizontal: 24),
-                        child: Text('RECENT SEARCHES', style: _sectionLabelStyle),
+                        child: Text(
+                          'RECENT SEARCHES',
+                          style: _sectionLabelStyle,
+                        ),
                       ),
                       const SizedBox(height: 4),
                       Expanded(
@@ -294,7 +297,8 @@ class _SearchPageState extends State<SearchPage> {
                           separatorBuilder: (_, _) => const SizedBox(height: 8),
                           itemBuilder: (_, i) => _SearchResultTile(
                             location: _recentSearches[i],
-                            onTap: () => _onLocationSelected(_recentSearches[i]),
+                            onTap: () =>
+                                _onLocationSelected(_recentSearches[i]),
                           ),
                         ),
                       ),
@@ -348,7 +352,7 @@ class _SearchResultTile extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        height: 90,
+        constraints: const BoxConstraints(minHeight: 90),
         decoration: BoxDecoration(
           color: Colors.transparent,
           borderRadius: BorderRadius.circular(48),
@@ -376,16 +380,19 @@ class _SearchResultTile extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Row(
-                    crossAxisAlignment: CrossAxisAlignment.baseline,
-                    textBaseline: TextBaseline.alphabetic,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        location.name,
-                        style: GoogleFonts.spaceGrotesk(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.textPrimary,
-                          height: 1.55,
+                      Flexible(
+                        child: Text(
+                          location.name,
+                          style: GoogleFonts.spaceGrotesk(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.textPrimary,
+                            height: 1.55,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                       if (location.countryCode.isNotEmpty)
