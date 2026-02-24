@@ -16,7 +16,9 @@ class DashboardPage extends StatelessWidget {
     final location = Get.arguments as GeocodingResult?;
 
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF121212) : const Color(0xFFF8F9FA),
+      backgroundColor: isDark
+          ? const Color(0xFF121212)
+          : const Color(0xFFF8F9FA),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -56,11 +58,7 @@ class DashboardPage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.cloud,
-              size: 120,
-              color: const Color(0xFF4A90E2),
-            ),
+            Icon(Icons.cloud, size: 120, color: const Color(0xFF4A90E2)),
             const SizedBox(height: 24),
             Text(
               'Dashboard Coming Soon',

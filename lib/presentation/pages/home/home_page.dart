@@ -7,9 +7,7 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('AeroSense'),
-      ),
+      appBar: AppBar(title: const Text('AeroSense')),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -20,20 +18,14 @@ class HomePage extends StatelessWidget {
               color: Get.theme.colorScheme.primary,
             ),
             const SizedBox(height: 24),
-            Text(
-              'Welcome to AeroSense',
-              style: Get.textTheme.displaySmall,
-            ),
+            Text('Welcome to AeroSense', style: Get.textTheme.displaySmall),
             const SizedBox(height: 16),
             Text(
               'Advanced Drone Flight Analytics',
               style: Get.textTheme.bodyLarge,
             ),
             const SizedBox(height: 8),
-            Text(
-              'and Safety Management',
-              style: Get.textTheme.bodyLarge,
-            ),
+            Text('and Safety Management', style: Get.textTheme.bodyLarge),
           ],
         ),
       ),

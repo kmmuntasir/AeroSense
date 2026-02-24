@@ -13,13 +13,16 @@ class WeatherController extends GetxController {
 
   // Reactive variables
   final Rx<WeatherResponse?> _currentWeather = Rx<WeatherResponse?>(null);
-  final Rx<Map<String, WeatherResponse>> _savedWeatherData = Rx<Map<String, WeatherResponse>>({});
+  final Rx<Map<String, WeatherResponse>> _savedWeatherData =
+      Rx<Map<String, WeatherResponse>>({});
   final RxBool _isLoading = RxBool(false);
   final RxString _errorMessage = RxString('');
   final RxString _meaningInsights = RxString('');
 
   // Temperature units
-  final Rx<TemperatureUnit> _temperatureUnit = Rx<TemperatureUnit>(TemperatureUnit.celsius);
+  final Rx<TemperatureUnit> _temperatureUnit = Rx<TemperatureUnit>(
+    TemperatureUnit.celsius,
+  );
 
   // Getters
   WeatherResponse? get currentWeather => _currentWeather.value;
@@ -28,12 +31,12 @@ class WeatherController extends GetxController {
   String get errorMessage => _errorMessage.value;
   String get meaningInsights => _meaningInsights.value;
   TemperatureUnit get temperatureUnit => _temperatureUnit.value;
-  double get currentTemperature => _currentWeather.value?.current.temperature2M ?? 0.0;
+  double get currentTemperature =>
+      _currentWeather.value?.current.temperature2M ?? 0.0;
   String get currentLocation => _currentWeather.value != null
       ? '${_currentWeather.value!.latitude.toStringAsFixed(2)}, ${_currentWeather.value!.longitude.toStringAsFixed(2)}'
       : 'Unknown';
 
-  
   @override
   void onInit() {
     super.onInit();
@@ -55,8 +58,8 @@ class WeatherController extends GetxController {
       final savedWeatherDataJson = _storage.read('saved_weather_data');
       if (savedWeatherDataJson != null) {
         final weatherMap = Map<String, dynamic>.from(savedWeatherDataJson);
-        _savedWeatherData.value = weatherMap.map((key, value) =>
-          MapEntry(key, WeatherResponse.fromJson(value))
+        _savedWeatherData.value = weatherMap.map(
+          (key, value) => MapEntry(key, WeatherResponse.fromJson(value)),
         );
       }
 
@@ -69,7 +72,8 @@ class WeatherController extends GetxController {
         );
       }
     } catch (e) {
-      _errorMessage.value = 'Failed to initialize weather data: ${e.toString()}';
+      _errorMessage.value =
+          'Failed to initialize weather data: ${e.toString()}';
     }
   }
 
@@ -121,8 +125,13 @@ class WeatherController extends GetxController {
       );
 
       // Store weather data
-      final locationKey = locationName ?? '${latitude.toStringAsFixed(2)},${longitude.toStringAsFixed(2)}';
-      _savedWeatherData.value = {..._savedWeatherData.value, locationKey: weather};
+      final locationKey =
+          locationName ??
+          '${latitude.toStringAsFixed(2)},${longitude.toStringAsFixed(2)}';
+      _savedWeatherData.value = {
+        ..._savedWeatherData.value,
+        locationKey: weather,
+      };
       _saveWeatherDataToStorage();
 
       // If this is the current location, update it
@@ -157,14 +166,18 @@ class WeatherController extends GetxController {
       for (int i = 0; i < locations.length; i++) {
         if (i < results.length) {
           final locationKey = locations[i].formattedLocation;
-          _savedWeatherData.value = {..._savedWeatherData.value, locationKey: results[i]};
+          _savedWeatherData.value = {
+            ..._savedWeatherData.value,
+            locationKey: results[i],
+          };
         }
       }
 
       _saveWeatherDataToStorage();
       _errorMessage.value = '';
     } catch (e) {
-      _errorMessage.value = 'Failed to fetch weather for saved locations: ${e.toString()}';
+      _errorMessage.value =
+          'Failed to fetch weather for saved locations: ${e.toString()}';
     } finally {
       _isLoading.value = false;
     }
@@ -183,14 +196,16 @@ class WeatherController extends GetxController {
       case TemperatureUnit.celsius:
         return tempCelsius;
       case TemperatureUnit.fahrenheit:
-        return (tempCelsius * 9/5) + 32;
+        return (tempCelsius * 9 / 5) + 32;
     }
   }
 
   /// Get temperature with unit suffix
   String getTemperatureWithUnit(double tempCelsius) {
     final temp = convertTemperature(tempCelsius);
-    final unit = _temperatureUnit.value == TemperatureUnit.celsius ? '°C' : '°F';
+    final unit = _temperatureUnit.value == TemperatureUnit.celsius
+        ? '°C'
+        : '°F';
     return '${temp.toStringAsFixed(1)}$unit';
   }
 
@@ -237,7 +252,9 @@ class WeatherController extends GetxController {
     }
 
     // Weather condition insights
-    final condition = _weatherProvider.getWeatherCodeDescription(weatherCode ?? 0);
+    final condition = _weatherProvider.getWeatherCodeDescription(
+      weatherCode ?? 0,
+    );
     insights += 'Conditions: $condition';
 
     _meaningInsights.value = insights;
@@ -257,7 +274,8 @@ class WeatherController extends GetxController {
 
   /// Remove saved weather data for a location
   void removeSavedWeather(String locationKey) {
-    _savedWeatherData.value = Map.from(_savedWeatherData.value)..remove(locationKey);
+    _savedWeatherData.value = Map.from(_savedWeatherData.value)
+      ..remove(locationKey);
     _saveWeatherDataToStorage();
   }
 
@@ -317,8 +335,8 @@ class WeatherController extends GetxController {
 
   void _saveWeatherDataToStorage() {
     try {
-      final weatherMap = _savedWeatherData.value.map((key, value) =>
-        MapEntry(key, value.toJson())
+      final weatherMap = _savedWeatherData.value.map(
+        (key, value) => MapEntry(key, value.toJson()),
       );
       _storage.write('saved_weather_data', weatherMap);
     } catch (e) {

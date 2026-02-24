@@ -95,7 +95,9 @@ class GeocodingProvider {
       if (e is ApiException) {
         rethrow;
       }
-      throw ApiException('Failed to reverse geocode coordinates: ${e.toString()}');
+      throw ApiException(
+        'Failed to reverse geocode coordinates: ${e.toString()}',
+      );
     }
   }
 
@@ -113,7 +115,9 @@ class GeocodingProvider {
       );
 
       if (results.isEmpty) {
-        throw ApiException('No location found for coordinates: $latitude, $longitude');
+        throw ApiException(
+          'No location found for coordinates: $latitude, $longitude',
+        );
       }
 
       return results.first;
@@ -175,7 +179,9 @@ class GeocodingProvider {
       );
 
       return results
-          .where((result) => result.name.toLowerCase().contains(query.toLowerCase()))
+          .where(
+            (result) => result.name.toLowerCase().contains(query.toLowerCase()),
+          )
           .map((result) => result.formattedLocation)
           .toList();
     } catch (e) {
@@ -224,7 +230,10 @@ class GeocodingProvider {
 
   /// Validates if coordinates are within valid latitude and longitude ranges
   bool isValidCoordinates(double latitude, double longitude) {
-    return latitude >= -90 && latitude <= 90 && longitude >= -180 && longitude <= 180;
+    return latitude >= -90 &&
+        latitude <= 90 &&
+        longitude >= -180 &&
+        longitude <= 180;
   }
 
   /// Calculates distance between two coordinates using Haversine formula
@@ -239,8 +248,12 @@ class GeocodingProvider {
     final double dLat = _toRadians(lat2 - lat1);
     final double dLon = _toRadians(lon2 - lon1);
 
-    final double a = (math.sin(dLat / 2) * math.sin(dLat / 2)) +
-        (math.cos(_toRadians(lat1)) * math.cos(_toRadians(lat2)) * math.sin(dLon / 2) * math.sin(dLon / 2));
+    final double a =
+        (math.sin(dLat / 2) * math.sin(dLat / 2)) +
+        (math.cos(_toRadians(lat1)) *
+            math.cos(_toRadians(lat2)) *
+            math.sin(dLon / 2) *
+            math.sin(dLon / 2));
 
     final double c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a));
 

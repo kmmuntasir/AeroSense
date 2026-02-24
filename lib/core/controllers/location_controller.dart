@@ -52,12 +52,15 @@ class LocationController extends GetxController {
       _hasPermission.value = status.isGranted;
 
       if (status.isDenied) {
-        _errorMessage.value = 'Location permission is required for weather data';
+        _errorMessage.value =
+            'Location permission is required for weather data';
       } else if (status.isPermanentlyDenied) {
-        _errorMessage.value = 'Location permission permanently denied. Please enable in settings.';
+        _errorMessage.value =
+            'Location permission permanently denied. Please enable in settings.';
       }
     } catch (e) {
-      _errorMessage.value = 'Error checking location permission: ${e.toString()}';
+      _errorMessage.value =
+          'Error checking location permission: ${e.toString()}';
     }
   }
 
@@ -74,14 +77,16 @@ class LocationController extends GetxController {
         _errorMessage.value = '';
         return true;
       } else if (status.isPermanentlyDenied) {
-        _errorMessage.value = 'Location permission permanently denied. Please enable in settings.';
+        _errorMessage.value =
+            'Location permission permanently denied. Please enable in settings.';
         return false;
       } else {
         _errorMessage.value = 'Location permission denied';
         return false;
       }
     } catch (e) {
-      _errorMessage.value = 'Error requesting location permission: ${e.toString()}';
+      _errorMessage.value =
+          'Error requesting location permission: ${e.toString()}';
       return false;
     } finally {
       _isLoading.value = false;
@@ -102,7 +107,8 @@ class LocationController extends GetxController {
       // Check if location services are enabled
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
-        _errorMessage.value = 'Location services are disabled. Please enable location services.';
+        _errorMessage.value =
+            'Location services are disabled. Please enable location services.';
         return false;
       }
 
@@ -169,7 +175,9 @@ class LocationController extends GetxController {
     try {
       // Check if location already exists
       final existingIndex = _savedLocations.indexWhere(
-        (saved) => saved.latitude == location.latitude && saved.longitude == location.longitude,
+        (saved) =>
+            saved.latitude == location.latitude &&
+            saved.longitude == location.longitude,
       );
 
       if (existingIndex == -1) {
@@ -186,7 +194,9 @@ class LocationController extends GetxController {
   Future<void> removeLocation(GeocodingResult location) async {
     try {
       _savedLocations.removeWhere(
-        (saved) => saved.latitude == location.latitude && saved.longitude == location.longitude,
+        (saved) =>
+            saved.latitude == location.latitude &&
+            saved.longitude == location.longitude,
       );
       _saveLocationsToStorage();
     } catch (e) {
@@ -197,13 +207,17 @@ class LocationController extends GetxController {
   /// Check if a location is saved
   bool isLocationSaved(GeocodingResult location) {
     return _savedLocations.any(
-      (saved) => saved.latitude == location.latitude && saved.longitude == location.longitude,
+      (saved) =>
+          saved.latitude == location.latitude &&
+          saved.longitude == location.longitude,
     );
   }
 
   /// Get saved locations with formatted names
   List<String> get savedLocationNames {
-    return _savedLocations.map((location) => location.formattedLocation).toList();
+    return _savedLocations
+        .map((location) => location.formattedLocation)
+        .toList();
   }
 
   /// Get current location as GeocodingResult
@@ -233,10 +247,13 @@ class LocationController extends GetxController {
   /// Save locations to storage
   void _saveLocationsToStorage() {
     try {
-      final locationsJson = _savedLocations.map((location) => location.toJson()).toList();
+      final locationsJson = _savedLocations
+          .map((location) => location.toJson())
+          .toList();
       _storage.write('saved_locations', locationsJson);
     } catch (e) {
-      _errorMessage.value = 'Failed to save locations to storage: ${e.toString()}';
+      _errorMessage.value =
+          'Failed to save locations to storage: ${e.toString()}';
     }
   }
 
