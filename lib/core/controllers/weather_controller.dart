@@ -241,8 +241,14 @@ class WeatherController extends GetxController {
   Future<bool> fetchCurrentWeather() async {
     try {
       if (_locationController.currentPosition == null) {
-        _errorMessage.value = 'Please enable location services first';
-        return false;
+        final located = await _locationController.getCurrentLocation();
+        if (!located || _locationController.currentPosition == null) {
+          _errorMessage.value =
+              _locationController.errorMessage.isNotEmpty
+                  ? _locationController.errorMessage
+                  : 'Please enable location services first';
+          return false;
+        }
       }
 
       _isLoading.value = true;
