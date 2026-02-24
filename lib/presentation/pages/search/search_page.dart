@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/constants/app_assets.dart';
 import '../../../core/constants/app_colors.dart';
@@ -9,41 +10,15 @@ import '../../../core/controllers/location_controller.dart';
 import '../../../core/models/geocoding_response.dart';
 import '../../../core/widgets/common_icon.dart';
 
-// Dummy location data matching the Figma "San" search simulation
-final List<GeocodingResult> _defaultLocations = [
-  GeocodingResult(
-    name: 'San Francisco',
-    country: 'United States',
-    countryCode: 'US',
-    state: 'California',
-    latitude: 37.7749,
-    longitude: -122.4194,
-  ),
-  GeocodingResult(
-    name: 'San Diego',
-    country: 'United States',
-    countryCode: 'US',
-    state: 'California',
-    latitude: 32.7157,
-    longitude: -117.1611,
-  ),
-  GeocodingResult(
-    name: 'Santiago',
-    country: 'Chile',
-    countryCode: 'CL',
-    state: 'Santiago Metropolitan',
-    latitude: -33.4489,
-    longitude: -70.6693,
-  ),
-  GeocodingResult(
-    name: 'San Antonio',
-    country: 'United States',
-    countryCode: 'US',
-    state: 'Texas',
-    latitude: 29.4241,
-    longitude: -98.4936,
-  ),
-];
+const _kRecentSearchesKey = 'recent_searches';
+const _kMaxRecentSearches = 5;
+
+const _sectionLabelStyle = TextStyle(
+  fontSize: 11,
+  fontWeight: FontWeight.w600,
+  color: AppColors.textSecondary,
+  letterSpacing: 0.8,
+);
 
 class SearchPage extends StatefulWidget {
   const SearchPage({super.key});
@@ -54,21 +29,21 @@ class SearchPage extends StatefulWidget {
 
 class _SearchPageState extends State<SearchPage> {
   final LocationController _locationController = Get.find<LocationController>();
+  final GetStorage _storage = GetStorage();
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _focusNode = FocusNode();
 
-  // Initialised with dummy data so locations show on first load
-  final RxList<GeocodingResult> _searchResults = RxList<GeocodingResult>(
-    List.of(_defaultLocations),
-  );
+  final RxList<GeocodingResult> _recentSearches = RxList<GeocodingResult>([]);
+  final RxList<GeocodingResult> _searchResults = RxList<GeocodingResult>([]);
   final RxBool _isSearching = RxBool(false);
   final RxBool _hasText = RxBool(false);
-  final RxBool _showingDefaults = RxBool(true);
+  final RxBool _showingRecents = RxBool(true);
   Timer? _debounceTimer;
 
   @override
   void initState() {
     super.initState();
+    _loadRecentSearches();
     _searchController.addListener(() {
       _hasText.value = _searchController.text.isNotEmpty;
     });
@@ -85,36 +60,42 @@ class _SearchPageState extends State<SearchPage> {
     super.dispose();
   }
 
+  void _loadRecentSearches() {
+    final raw = _storage.read<List>(_kRecentSearchesKey);
+    if (raw == null) return;
+    _recentSearches.value = raw
+        .whereType<Map<String, dynamic>>()
+        .map(GeocodingResult.fromJson)
+        .toList();
+  }
+
+  void _saveToRecentSearches(GeocodingResult location) {
+    // Deduplicate by coordinates
+    _recentSearches.removeWhere(
+      (r) =>
+          r.latitude == location.latitude && r.longitude == location.longitude,
+    );
+    _recentSearches.insert(0, location);
+    if (_recentSearches.length > _kMaxRecentSearches) {
+      _recentSearches.removeRange(_kMaxRecentSearches, _recentSearches.length);
+    }
+    _storage.write(
+      _kRecentSearchesKey,
+      _recentSearches.map((r) => r.toJson()).toList(),
+    );
+  }
+
   void _onSearchChanged(String query) {
     _debounceTimer?.cancel();
 
     if (query.trim().isEmpty) {
-      _searchResults.value = List.of(_defaultLocations);
+      _searchResults.clear();
       _isSearching.value = false;
-      _showingDefaults.value = true;
+      _showingRecents.value = true;
       return;
     }
 
-    _showingDefaults.value = false;
-
-    // Filter local dummy data first (instant, no network)
-    final q = query.toLowerCase().trim();
-    final localResults = _defaultLocations
-        .where(
-          (loc) =>
-              loc.name.toLowerCase().contains(q) ||
-              (loc.state?.toLowerCase().contains(q) ?? false) ||
-              loc.country.toLowerCase().contains(q),
-        )
-        .toList();
-
-    if (localResults.isNotEmpty) {
-      _searchResults.value = localResults;
-      _isSearching.value = false;
-      return;
-    }
-
-    // No local match — fall through to real API with cancellable debounce
+    _showingRecents.value = false;
     _isSearching.value = true;
     _debounceTimer = Timer(
       const Duration(milliseconds: 500),
@@ -130,15 +111,16 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   void _onLocationSelected(GeocodingResult location) {
+    _saveToRecentSearches(location);
     Get.offAllNamed('/dashboard', arguments: location);
   }
 
   void _clearSearch() {
     _debounceTimer?.cancel();
     _searchController.clear();
-    _searchResults.value = List.of(_defaultLocations);
+    _searchResults.clear();
     _isSearching.value = false;
-    _showingDefaults.value = true;
+    _showingRecents.value = true;
   }
 
   @override
@@ -151,7 +133,6 @@ class _SearchPageState extends State<SearchPage> {
           children: [
             const SizedBox(height: 24),
 
-            // Hero icon — ic_search_hero.svg, Figma node 11:1195 (128×136)
             const CommonIcon(
               path: AppAssets.icSearchHero,
               width: 104,
@@ -159,62 +140,7 @@ class _SearchPageState extends State<SearchPage> {
             ),
             const SizedBox(height: 16),
 
-            // Heading — exact Figma copy, 28px Bold
             Padding(
-              /*padding: const EdgeInsets.all(16.0),
-              child: Column(
-                children: [
-                  const SizedBox(height: 16),
-                  // Search icon (optional visual)
-                  Icon(Icons.search, size: 48, color: const Color(0xFF4A90E2)),
-                  const SizedBox(height: 24),
-                  // Headline
-                  Text(
-                    "Let's find your weather",
-                    style: theme.textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: isDark ? Colors.white : const Color(0xFF121212),
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 8),
-                  // Subtext
-                  Text(
-                    'Search for a city to check the current forecast.',
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: isDark ? Colors.white70 : const Color(0xFF6B7280),
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 32),
-                  // Search Bar
-                  Container(
-                    height: 56,
-                    decoration: BoxDecoration(
-                      color: isDark
-                          ? const Color(0xFF2A2D32)
-                          : const Color(0xFFEDEDED),
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: TextField(
-                      controller: _searchController,
-                      focusNode: _focusNode,
-                      onChanged: _onSearchChanged,
-                      decoration: InputDecoration(
-                        hintText: 'Search city...',
-                        hintStyle: TextStyle(
-                          color: isDark
-                              ? Colors.white38
-                              : const Color(0xFF9CA3AF),
-                        ),
-                        prefixIcon: const Icon(
-                          Icons.search,
-                          color: Color(0xFF4A90E2),
-                        ),
-                        border: InputBorder.none,
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 16,*/
               padding: const EdgeInsets.symmetric(horizontal: 32),
               child: Text(
                 "Let's find your weather",
@@ -229,7 +155,6 @@ class _SearchPageState extends State<SearchPage> {
             ),
             const SizedBox(height: 12),
 
-            // Body — exact Figma copy, 16px
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 32),
               child: Text(
@@ -245,7 +170,7 @@ class _SearchPageState extends State<SearchPage> {
             ),
             const SizedBox(height: 32),
 
-            // Search bar — pill shape, #EDEDED fill, 342×56
+            // Search bar
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: Obx(
@@ -257,7 +182,6 @@ class _SearchPageState extends State<SearchPage> {
                   ),
                   child: Row(
                     children: [
-                      // Leading search icon — 38px container
                       const SizedBox(
                         width: 38,
                         height: 56,
@@ -270,7 +194,6 @@ class _SearchPageState extends State<SearchPage> {
                         ),
                       ),
                       const SizedBox(width: 4),
-                      // Text input
                       Expanded(
                         child: TextField(
                           controller: _searchController,
@@ -295,7 +218,6 @@ class _SearchPageState extends State<SearchPage> {
                           ),
                         ),
                       ),
-                      // Trailing clear button — visible when typing
                       if (_hasText.value)
                         GestureDetector(
                           onTap: _clearSearch,
@@ -331,7 +253,7 @@ class _SearchPageState extends State<SearchPage> {
             ),
             const SizedBox(height: 16),
 
-            // Results list
+            // Results / recents list
             Expanded(
               child: Obx(() {
                 if (_isSearching.value) {
@@ -344,14 +266,46 @@ class _SearchPageState extends State<SearchPage> {
                   );
                 }
 
+                // Empty search → show recent searches
+                if (_showingRecents.value) {
+                  if (_recentSearches.isEmpty) {
+                    return Center(
+                      child: Text(
+                        'No recent searches',
+                        style: GoogleFonts.spaceGrotesk(
+                          fontSize: 16,
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                    );
+                  }
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 24),
+                        child: Text('RECENT SEARCHES', style: _sectionLabelStyle),
+                      ),
+                      const SizedBox(height: 4),
+                      Expanded(
+                        child: ListView.separated(
+                          padding: const EdgeInsets.symmetric(horizontal: 24),
+                          itemCount: _recentSearches.length,
+                          separatorBuilder: (_, _) => const SizedBox(height: 8),
+                          itemBuilder: (_, i) => _SearchResultTile(
+                            location: _recentSearches[i],
+                            onTap: () => _onLocationSelected(_recentSearches[i]),
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                }
+
+                // API search results
                 if (_searchResults.isEmpty) {
                   return Center(
                     child: Text(
-                      /*_searchController.text.isEmpty ? '' : 'No cities found',
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: isDark
-                            ? Colors.white60
-                            : const Color(0xFF6B7280),*/
                       'No cities found',
                       style: GoogleFonts.spaceGrotesk(
                         fontSize: 16,
@@ -364,59 +318,11 @@ class _SearchPageState extends State<SearchPage> {
                 return ListView.separated(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
                   itemCount: _searchResults.length,
-                  separatorBuilder: (context, index) =>
-                      const SizedBox(height: 8),
-                  itemBuilder: (context, index) {
-                    final location = _searchResults[index];
-                    /*return Container(
-                      decoration: BoxDecoration(
-                        color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: ListTile(
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 8,
-                        ),
-                        leading: Container(
-                          width: 40,
-                          height: 40,
-                          decoration: BoxDecoration(
-                            color: const Color(
-                              0xFF4A90E2,
-                            ).withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: const Icon(
-                            Icons.location_city,
-                            color: Color(0xFF4A90E2),
-                            size: 24,
-                          ),
-                        ),
-                        title: Text(
-                          location.name,
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: isDark
-                                ? Colors.white
-                                : const Color(0xFF121212),
-                          ),
-                        ),
-                        subtitle: Text(
-                          location.formattedLocation,
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            color: isDark
-                                ? Colors.white60
-                                : const Color(0xFF6B7280),
-                          ),
-                        ),
-                        onTap: () => _onLocationSelected(location),
-                      ),*/
-                    return _SearchResultTile(
-                      location: location,
-                      onTap: () => _onLocationSelected(location),
-                    );
-                  },
+                  separatorBuilder: (_, _) => const SizedBox(height: 8),
+                  itemBuilder: (_, i) => _SearchResultTile(
+                    location: _searchResults[i],
+                    onTap: () => _onLocationSelected(_searchResults[i]),
+                  ),
                 );
               }),
             ),
@@ -435,8 +341,8 @@ class _SearchResultTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final adminRegion = location.state?.isNotEmpty == true
-        ? location.state!
+    final adminRegion = location.admin1?.isNotEmpty == true
+        ? location.admin1!
         : location.country;
 
     return GestureDetector(
@@ -450,7 +356,6 @@ class _SearchResultTile extends StatelessWidget {
         padding: const EdgeInsets.fromLTRB(8, 16, 13, 16),
         child: Row(
           children: [
-            // Leading location circle icon — 40×40
             Container(
               width: 40,
               height: 40,
@@ -465,14 +370,11 @@ class _SearchResultTile extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 12),
-
-            // Text: city name + country code on one row, region below
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // City name + country code row
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.baseline,
                     textBaseline: TextBaseline.alphabetic,
@@ -513,8 +415,6 @@ class _SearchResultTile extends StatelessWidget {
                 ],
               ),
             ),
-
-            // Trailing arrow — 19×19 in Figma
             const SizedBox(
               width: 19,
               height: 19,
