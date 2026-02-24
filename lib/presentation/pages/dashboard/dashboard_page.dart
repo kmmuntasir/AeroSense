@@ -3,15 +3,19 @@ import 'package:get/get.dart';
 import 'package:aero_sense/core/constants/app_colors.dart';
 import 'package:aero_sense/core/controllers/weather_controller.dart';
 import 'package:aero_sense/core/controllers/location_controller.dart';
+import 'package:aero_sense/core/controllers/weather_controller.dart';
 import 'package:aero_sense/core/models/geocoding_response.dart';
-import 'package:aero_sense/presentation/widgets/dashboard/current_weather_hero.dart';
-import 'package:aero_sense/presentation/widgets/dashboard/insights_card.dart';
-import 'package:aero_sense/presentation/widgets/dashboard/hourly_forecast_list.dart';
-import 'package:aero_sense/presentation/widgets/dashboard/daily_forecast_list.dart';
-import 'package:aero_sense/presentation/widgets/dashboard/air_quality_card.dart';
-import 'package:aero_sense/presentation/widgets/dashboard/wind_card.dart';
-import 'package:aero_sense/presentation/widgets/dashboard/humidity_card.dart';
 import 'package:aero_sense/presentation/pages/locations/locations_page.dart';
+import 'package:aero_sense/presentation/widgets/common_bottom_nav.dart';
+import 'package:aero_sense/presentation/widgets/dashboard/air_quality_card.dart';
+import 'package:aero_sense/presentation/widgets/dashboard/current_weather_hero.dart';
+import 'package:aero_sense/presentation/widgets/dashboard/daily_forecast_list.dart';
+import 'package:aero_sense/presentation/widgets/dashboard/hourly_forecast_list.dart';
+import 'package:aero_sense/presentation/widgets/dashboard/humidity_card.dart';
+import 'package:aero_sense/presentation/widgets/dashboard/insights_card.dart';
+import 'package:aero_sense/presentation/widgets/dashboard/wind_card.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 // ── Shell ─────────────────────────────────────────────────────────────────────
 
@@ -25,20 +29,6 @@ class DashboardPage extends StatefulWidget {
 class _DashboardPageState extends State<DashboardPage> {
   int _selectedNavIndex = 0;
 
-  void _onNavTap(int index) {
-    if (index == _selectedNavIndex) return;
-    switch (index) {
-      case 2:
-        // TODO: Navigate to Alerts (Task 11)
-        break;
-      case 3:
-        // TODO: Navigate to Settings (Task 10)
-        break;
-      default:
-        setState(() => _selectedNavIndex = index);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -46,9 +36,15 @@ class _DashboardPageState extends State<DashboardPage> {
         index: _selectedNavIndex,
         children: const [_DashboardTab(), LocationsPage()],
       ),
-      bottomNavigationBar: _DashboardBottomNav(
+      bottomNavigationBar: CommonBottomNav(
         selectedIndex: _selectedNavIndex,
-        onTap: _onNavTap,
+        onLocalTap: (index) {
+          if (index == 0 || index == 1) {
+            setState(() => _selectedNavIndex = index);
+            return true; // consumed locally
+          }
+          return false; // let CommonBottomNav route to /weather-alerts or /settings
+        },
       ),
     );
   }
@@ -194,60 +190,6 @@ class _DashboardTabState extends State<_DashboardTab> {
           ),
         );
       }),
-    );
-  }
-}
-
-// ── Bottom nav ────────────────────────────────────────────────────────────────
-
-class _DashboardBottomNav extends StatelessWidget {
-  const _DashboardBottomNav({required this.selectedIndex, required this.onTap});
-
-  final int selectedIndex;
-  final ValueChanged<int> onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Container(
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
-        border: Border(
-          top: BorderSide(
-            color: theme.colorScheme.outline.withValues(alpha: 0.2),
-          ),
-        ),
-      ),
-      child: NavigationBar(
-        selectedIndex: selectedIndex,
-        onDestinationSelected: onTap,
-        backgroundColor: Colors.transparent,
-        shadowColor: Colors.transparent,
-        surfaceTintColor: Colors.transparent,
-        destinations: const [
-          NavigationDestination(
-            icon: Icon(Icons.grid_view_outlined),
-            selectedIcon: Icon(Icons.grid_view),
-            label: 'Dashboard',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.location_on_outlined),
-            selectedIcon: Icon(Icons.location_on),
-            label: 'Locations',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.notifications_outlined),
-            selectedIcon: Icon(Icons.notifications),
-            label: 'Alerts',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.settings_outlined),
-            selectedIcon: Icon(Icons.settings),
-            label: 'Settings',
-          ),
-        ],
-      ),
     );
   }
 }

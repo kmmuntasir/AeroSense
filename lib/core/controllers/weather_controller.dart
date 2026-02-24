@@ -20,7 +20,7 @@ class WeatherController extends GetxController {
   final Rx<WeatherResponse?> _currentWeather = Rx<WeatherResponse?>(null);
   final Rx<Map<String, WeatherResponse>> _savedWeatherData =
       Rx<Map<String, WeatherResponse>>({});
-  final RxBool _isLoading = RxBool(false);
+  final RxBool _isLoading = RxBool(true);
   final RxString _errorMessage = RxString('');
   final RxString _meaningInsights = RxString('');
   final Rx<int?> _currentAqi = Rx<int?>(null);

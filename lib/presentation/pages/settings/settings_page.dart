@@ -2,6 +2,7 @@ import 'package:aero_sense/core/constants/app_constants.dart';
 import 'package:aero_sense/core/controllers/settings_controller.dart';
 import 'package:aero_sense/core/models/temperature_unit.dart';
 import 'package:aero_sense/core/themes/app_theme.dart';
+import 'package:aero_sense/presentation/widgets/common_bottom_nav.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -20,6 +21,7 @@ class SettingsPage extends GetView<SettingsController> {
         backgroundColor: cs.surfaceContainer,
         title: const Text('Settings'),
       ),
+      bottomNavigationBar: const CommonBottomNav(selectedIndex: 3),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
@@ -27,11 +29,7 @@ class SettingsPage extends GetView<SettingsController> {
             // ── Units ─────────────────────────────────────
             const _SectionLabel(label: 'UNITS'),
             const SizedBox(height: 8),
-            _SettingsCard(
-              children: [
-                _TemperatureRow(controller: controller),
-              ],
-            ),
+            _SettingsCard(children: [_TemperatureRow(controller: controller)]),
             const SizedBox(height: 24),
 
             // ── Appearance ────────────────────────────────
