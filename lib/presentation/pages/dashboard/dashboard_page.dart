@@ -1,3 +1,7 @@
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:aero_sense/core/constants/app_colors.dart';
+import 'package:aero_sense/core/controllers/weather_controller.dart';
 import 'package:aero_sense/core/controllers/location_controller.dart';
 import 'package:aero_sense/core/controllers/weather_controller.dart';
 import 'package:aero_sense/core/models/geocoding_response.dart';
@@ -77,7 +81,7 @@ class _DashboardTabState extends State<_DashboardTab> {
       _weatherController.fetchWeatherForLocation(
         latitude: _location.latitude,
         longitude: _location.longitude,
-        locationName: _location.name,
+        locationKey: _location.formattedLocation,
       );
     } else if (_weatherController.currentWeather == null) {
       // GPS-based — only fetch if no data exists yet.
@@ -88,6 +92,7 @@ class _DashboardTabState extends State<_DashboardTab> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final location = _location;
 
     return Scaffold(
       appBar: AppBar(
@@ -120,6 +125,29 @@ class _DashboardTabState extends State<_DashboardTab> {
         }),
         centerTitle: false,
         actions: [
+          if (location != null)
+            Obx(() {
+              final isSaved = _locationController.savedLocations.any(
+                (s) =>
+                    s.latitude == location.latitude &&
+                    s.longitude == location.longitude,
+              );
+              return IconButton(
+                icon: Icon(
+                  isSaved ? Icons.bookmark : Icons.bookmark_outline,
+                  color: isSaved
+                      ? AppColors.locationButton
+                      : theme.colorScheme.onSurface,
+                ),
+                onPressed: () async {
+                  if (isSaved) {
+                    await _locationController.removeLocation(location);
+                  } else {
+                    await _locationController.saveLocation(location);
+                  }
+                },
+              );
+            }),
           IconButton(
             icon: Icon(Icons.search, color: theme.colorScheme.onSurface),
             onPressed: () => Get.toNamed('/search'),

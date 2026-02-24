@@ -42,7 +42,7 @@ class _StubWeatherController extends WeatherController {
   Future<bool> fetchWeatherForLocation({
     required double latitude,
     required double longitude,
-    String? locationName,
+    String? locationKey,
   }) async => true;
 }
 

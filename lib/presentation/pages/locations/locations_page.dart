@@ -26,9 +26,9 @@ import 'package:get/get.dart';
 
 String _localTimeFor(double? utcOffsetSeconds) {
   if (utcOffsetSeconds == null) return '--:--';
-  final local = DateTime.now()
-      .toUtc()
-      .add(Duration(seconds: utcOffsetSeconds.round()));
+  final local = DateTime.now().toUtc().add(
+    Duration(seconds: utcOffsetSeconds.round()),
+  );
   final h = local.hour;
   final m = local.minute.toString().padLeft(2, '0');
   final period = h >= 12 ? 'PM' : 'AM';
@@ -39,11 +39,7 @@ String _localTimeFor(double? utcOffsetSeconds) {
 // ── Card shadow ───────────────────────────────────────────────────────────────
 
 const _cardShadow = [
-  BoxShadow(
-    color: Color(0x0F000000),
-    blurRadius: 8,
-    offset: Offset(0, 2),
-  ),
+  BoxShadow(color: Color(0x0F000000), blurRadius: 8, offset: Offset(0, 2)),
 ];
 
 const _cardRadius = BorderRadius.all(Radius.circular(16));
@@ -69,9 +65,10 @@ class LocationsPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.pageBackground,
       floatingActionButton: FloatingActionButton(
-        backgroundColor: AppColors.locationButton,
+        backgroundColor: Colors.blueAccent,
         foregroundColor: Colors.white,
         onPressed: controller.navigateToCitySearch,
+        shape: const CircleBorder(),
         child: const Icon(Icons.add),
       ),
       body: SafeArea(
@@ -97,7 +94,7 @@ class LocationsPage extends StatelessWidget {
                 if (loc != null) {
                   return _CurrentLocationCard(
                     location: loc,
-                    weather: controller.currentWeather,
+                    weather: controller.currentLocationWeather,
                     controller: controller,
                   );
                 }
@@ -134,7 +131,7 @@ class LocationsPage extends StatelessWidget {
                   final locations = controller.savedLocations;
                   final loading = controller.isLoadingWeather.value;
 
-                  if (loading && locations.isEmpty) {
+                  if (loading && locations.isNotEmpty) {
                     return const Center(child: CircularProgressIndicator());
                   }
 
@@ -150,13 +147,20 @@ class LocationsPage extends StatelessWidget {
                     );
                   }
 
+                  // Read all weather inside Obx scope so _savedWeatherData is a
+                  // direct reactive dependency — Obx rebuilds when weather arrives.
+                  final weatherMap = {
+                    for (final loc in locations)
+                      loc.formattedLocation: controller.weatherFor(loc),
+                  };
+
                   return ListView.separated(
                     padding: EdgeInsets.zero,
                     itemCount: locations.length,
                     separatorBuilder: (_, _) => const SizedBox(height: 12),
                     itemBuilder: (context, index) {
                       final loc = locations[index];
-                      final weather = controller.weatherFor(loc);
+                      final weather = weatherMap[loc.formattedLocation];
                       return Dismissible(
                         key: ValueKey(loc.formattedLocation),
                         direction: DismissDirection.endToStart,
@@ -232,10 +236,7 @@ class _LocationsSearchBar extends StatelessWidget {
             SizedBox(width: 10),
             Text(
               'Search for a city...',
-              style: TextStyle(
-                fontSize: 15,
-                color: AppColors.textSecondary,
-              ),
+              style: TextStyle(fontSize: 15, color: AppColors.textSecondary),
             ),
           ],
         ),
@@ -282,14 +283,36 @@ class _CurrentLocationCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    location.name,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.textPrimary,
-                    ),
-                    overflow: TextOverflow.ellipsis,
+                  Row(
+                    children: [
+                      Flexible(
+                        child: Text(
+                          location.name,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.textPrimary,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      if (location.countryCode.isNotEmpty) ...[
+                        const Text(
+                          ', ',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
+                        Text(
+                          location.countryCode,
+                          style: const TextStyle(
+                            fontSize: 14,
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
+                      ],
+                    ],
                   ),
                   const SizedBox(height: 2),
                   const Text(
@@ -341,7 +364,9 @@ class _SavedLocationCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final tempC = weather?.current.temperature2M;
     final code = weather?.current.weatherCode;
-    final localTime = _localTimeFor(location.utcOffsetSeconds);
+    final localTime = _localTimeFor(
+      weather?.utcOffsetSeconds ?? location.utcOffsetSeconds,
+    );
 
     return GestureDetector(
       onTap: () => controller.navigateToLocation(location),
