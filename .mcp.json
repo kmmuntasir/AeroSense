@@ -5,10 +5,11 @@
       "command": "npx",
       "args": [
         "-y",
-        "@modelcontextprotocol/server-github",
-        "--github-personal-access-token",
-        "${GITHUB_TOKEN}"
-      ]
+        "@modelcontextprotocol/server-github"
+      ],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_TOKEN}"
+      }
     },
     "figma": {
       "type": "stdio",

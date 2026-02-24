@@ -132,11 +132,27 @@ class GeocodingProvider {
     String? language = 'en',
     String? format = 'json',
   }) async {
-    final result = await reverseGeocode(
-      latitude: latitude,
-      longitude: longitude,
-    );
-    return [result];
+    try {
+      final results = await searchByCoordinates(
+        latitude: latitude,
+        longitude: longitude,
+        count: 1,
+        language: language,
+      );
+
+      if (results.isEmpty) {
+        throw ApiException(
+          'No location found for coordinates: $latitude, $longitude',
+        );
+      }
+
+      return results.first;
+    } catch (e) {
+      if (e is ApiException) {
+        rethrow;
+      }
+      throw ApiException('Failed to reverse geocode: ${e.toString()}');
+    }
   }
 
   Future<List<GeocodingResult>> searchWithinBounds({

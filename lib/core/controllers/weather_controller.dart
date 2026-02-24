@@ -212,6 +212,32 @@ class WeatherController extends GetxController {
   // ── Public fetch methods ───────────────────────────────────────────────────
 
   /// Fetch weather (and AQI) for the current GPS position.
+  Future<void> _initializeWeatherData() async {
+    try {
+      // Load saved weather data from storage
+      final savedWeatherDataJson = _storage.read('saved_weather_data');
+      if (savedWeatherDataJson != null) {
+        final weatherMap = Map<String, dynamic>.from(savedWeatherDataJson);
+        _savedWeatherData.value = weatherMap.map(
+          (key, value) => MapEntry(key, WeatherResponse.fromJson(value)),
+        );
+      }
+
+      // Load temperature unit preference
+      final savedUnit = _storage.read('temperature_unit');
+      if (savedUnit != null) {
+        _temperatureUnit.value = TemperatureUnit.values.firstWhere(
+          (unit) => unit.name == savedUnit,
+          orElse: () => TemperatureUnit.celsius,
+        );
+      }
+    } catch (e) {
+      _errorMessage.value =
+          'Failed to initialize weather data: ${e.toString()}';
+    }
+  }
+
+  /// Fetch current weather for the current location
   Future<bool> fetchCurrentWeather() async {
     try {
       if (_locationController.currentPosition == null) {
@@ -483,6 +509,7 @@ class WeatherController extends GetxController {
       insights += 'Moderate winds. ';
     }
 
+    // Weather condition insights
     final condition = _weatherProvider.getWeatherCodeDescription(
       weatherCode ?? 0,
     );
@@ -491,6 +518,74 @@ class WeatherController extends GetxController {
     _meaningInsights.value = insights;
   }
 
+  /// Refresh current weather data
+  Future<bool> refreshWeather() async {
+    return await fetchCurrentWeather();
+  }
+
+  /// Clear current weather data
+  void clearCurrentWeather() {
+    _currentWeather.value = null;
+    _errorMessage.value = '';
+    _meaningInsights.value = 'No weather data available';
+  }
+
+  /// Remove saved weather data for a location
+  void removeSavedWeather(String locationKey) {
+    _savedWeatherData.value = Map.from(_savedWeatherData.value)
+      ..remove(locationKey);
+    _saveWeatherDataToStorage();
+  }
+
+  /// Get weather forecast for the next 7 days
+  List<DailyWeather> get dailyForecast {
+    return _currentWeather.value?.daily ?? [];
+  }
+
+  /// Get hourly forecast for the next 24 hours
+  List<HourlyWeather> get hourlyForecast {
+    return _currentWeather.value?.hourly.take(24).toList() ?? [];
+  }
+
+  /// Check if current weather is suitable for drone flight
+  bool get isSuitableForFlight {
+    if (_currentWeather.value == null) return false;
+
+    final weather = _currentWeather.value!;
+    final temp = weather.current.temperature2M ?? 0.0;
+    final windSpeed = weather.current.windSpeed10M ?? 0.0;
+    const precipitationThreshold = 2.0; // mm
+    const maxWindSpeed = 15.0; // m/s
+    const tempRangeMin = -10.0; // °C
+    const tempRangeMax = 40.0; // °C
+
+    // Check temperature range
+    if (temp < tempRangeMin || temp > tempRangeMax) {
+      return false;
+    }
+
+    // Check wind speed
+    if (windSpeed > maxWindSpeed) {
+      return false;
+    }
+
+    // Check precipitation
+    if ((weather.current.precipitation ?? 0) > precipitationThreshold) {
+      return false;
+    }
+
+    return true;
+  }
+
+  /// Get flight suitability message
+  String get flightSuitabilityMessage {
+    if (!isSuitableForFlight) {
+      return 'Current conditions are not suitable for drone flight';
+    }
+    return 'Conditions are suitable for drone flight';
+  }
+
+  // Private helper methods
   void _applyTemperatureUnit() {
     _updateMeaningInsights();
   }
@@ -504,5 +599,11 @@ class WeatherController extends GetxController {
     } catch (e) {
       _errorMessage.value = 'Failed to save weather data: ${e.toString()}';
     }
+  }
+
+  @override
+  void onClose() {
+    // Clean up resources if needed
+    super.onClose();
   }
 }

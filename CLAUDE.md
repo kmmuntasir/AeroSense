@@ -81,6 +81,19 @@ flutter build web
 flutter pub run flutter_native_splash:create
 ```
 
+## Asset Management
+
+### Icons & Images
+- **Directory**: Use existing `assets/` or create it along with `icons` and `images` subfolders if missing.
+- **Format**: Prefer **SVG** for icons/illustrations. Use **PNG** for complex imagery.
+- **Naming**: Use `snake_case` with prefixes: `ic_` for icons, `img_` for images.
+- **Handling**: Use format-agnostic widgets (e.g., `CommonIcon`) to handle `.svg` and `.png` dynamically.
+- **Theming**: Always apply colors via `colorFilter` (SVG) or `color` (PNG/Icon) using `Theme.of(context).colorScheme`.
+
+### Conversion
+- For dev-time conversion, use `ffmpeg` if available or the `ffmpeg_kit_flutter_new` package.
+- Avoid large conversion packages in production unless necessary for features.
+
 ## Flutter Development Rules
 
 ### General Rules
