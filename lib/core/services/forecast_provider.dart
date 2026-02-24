@@ -7,7 +7,7 @@ class ForecastProvider {
   static const String _forecastPath = '/v1/forecast';
 
   ForecastProvider({ApiClient? apiClient})
-      : _apiClient = apiClient ?? ApiClient(baseUrl: _baseUrl);
+    : _apiClient = apiClient ?? ApiClient(baseUrl: _baseUrl);
 
   /// Fetch detailed forecast for given location
   Future<ForecastResponse> getForecast({
@@ -21,7 +21,7 @@ class ForecastProvider {
         'latitude': latitude.toString(),
         'longitude': longitude.toString(),
         'hourly':
-            'temperature_2m,apparent_temperature,weather_code,precipitation_probability,wind_speed_10m,relative_humidity_2m,pressure_msl',
+            'temperature_2m,apparent_temperature,weather_code,precipitation_probability,wind_speed_10m,relative_humidity_2m,pressure_msl,uv_index,visibility',
         'daily':
             'temperature_2m_max,temperature_2m_min,weather_code,precipitation_sum,precipitation_probability_max,wind_speed_10m_max',
         'current':
@@ -74,7 +74,7 @@ class ForecastProvider {
         'latitude': latitude.toString(),
         'longitude': longitude.toString(),
         'hourly':
-            'temperature_2m,apparent_temperature,weather_code,precipitation_probability,wind_speed_10m,relative_humidity_2m,pressure_msl',
+            'temperature_2m,apparent_temperature,weather_code,precipitation_probability,wind_speed_10m,relative_humidity_2m,pressure_msl,uv_index,visibility',
         'current':
             'temperature_2m,apparent_temperature,weather_code,wind_speed_10m,wind_direction_10m',
         'timezone': timezone,

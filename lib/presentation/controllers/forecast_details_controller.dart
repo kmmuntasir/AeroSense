@@ -125,7 +125,8 @@ class ForecastDetailsController extends GetxController {
       _updateForecastLists();
       _cacheForecast(forecast);
     } catch (e) {
-      _errorMessage.value = 'Failed to fetch extended forecast: ${e.toString()}';
+      _errorMessage.value =
+          'Failed to fetch extended forecast: ${e.toString()}';
     } finally {
       _isLoading.value = false;
     }
@@ -157,7 +158,7 @@ class ForecastDetailsController extends GetxController {
   /// Cache forecast locally
   void _cacheForecast(ForecastResponse forecast) {
     try {
-      _storage.write(_forecastCacheKey, forecast);
+      _storage.write(_forecastCacheKey, forecast.toJson());
       _storage.write(_cacheTimestampKey, DateTime.now().millisecondsSinceEpoch);
     } catch (e) {
       debugPrint('Failed to cache forecast: $e');
@@ -167,7 +168,7 @@ class ForecastDetailsController extends GetxController {
   /// Load forecast from cache if valid
   Future<void> _loadFromCache() async {
     try {
-      final cached = _storage.read<ForecastResponse?>(_forecastCacheKey);
+      final cached = _storage.read<Map>(_forecastCacheKey);
       final timestamp = _storage.read<int>(_cacheTimestampKey);
 
       if (cached != null && timestamp != null) {
@@ -175,7 +176,9 @@ class ForecastDetailsController extends GetxController {
         final age = DateTime.now().difference(cacheTime);
 
         if (age < _cacheDuration) {
-          _forecast.value = cached;
+          _forecast.value = ForecastResponse.fromJson(
+            cached.cast<String, dynamic>(),
+          );
           _updateForecastLists();
         }
       }

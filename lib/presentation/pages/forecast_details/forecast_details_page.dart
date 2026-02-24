@@ -318,7 +318,12 @@ class _DetailStatsGrid extends StatelessWidget {
     final hourly = forecast.hourly.getHoursAhead(1).firstOrNull;
     final humidity = hourly?.relativeHumidity ?? 45;
     final pressure = hourly?.pressure.toStringAsFixed(0) ?? '1012';
+    final pressureValue = hourly?.pressure ?? 1012.0;
     final dewPoint = hourly != null ? _dewPoint(hourly) : '58';
+    final uvIndex = hourly?.uvIndex.round() ?? 0;
+    final visibilityKm = (hourly?.visibility ?? 10000.0) / 1000;
+    final visibilityLabel = _visibilityLabel(visibilityKm);
+    final pressureLabel = _pressureLabel(pressureValue);
 
     return GridView.count(
       crossAxisCount: 2,
@@ -335,20 +340,20 @@ class _DetailStatsGrid extends StatelessWidget {
           unit: '%',
           subtitle: 'Dew Point is $dewPoint°',
         ),
-        _UVIndexCard(),
+        _UVIndexCard(uvIndex: uvIndex),
         _StatCard(
           icon: Icons.remove_red_eye_outlined,
           label: 'VISIBILITY',
-          value: '10',
-          unit: 'mi',
-          subtitle: 'Clear view',
+          value: visibilityKm.toStringAsFixed(0),
+          unit: 'km',
+          subtitle: visibilityLabel,
         ),
         _StatCard(
           icon: Icons.multiple_stop_rounded,
           label: 'PRESSURE',
           value: pressure,
           unit: 'hPa',
-          subtitle: 'Stable',
+          subtitle: pressureLabel,
         ),
       ],
     );
@@ -362,6 +367,19 @@ class _DetailStatsGrid extends StatelessWidget {
         (math.log(hourly.relativeHumidity / 100.0));
     final dp = (b * alpha) / (a - alpha);
     return dp.toStringAsFixed(0);
+  }
+
+  String _visibilityLabel(double km) {
+    if (km < 1) return 'Poor';
+    if (km < 5) return 'Moderate';
+    if (km < 10) return 'Good';
+    return 'Clear view';
+  }
+
+  String _pressureLabel(double hPa) {
+    if (hPa < 1000) return 'Low';
+    if (hPa <= 1020) return 'Stable';
+    return 'High';
   }
 }
 
@@ -432,13 +450,16 @@ class _StatCard extends StatelessWidget {
 }
 
 class _UVIndexCard extends StatelessWidget {
-  const _UVIndexCard();
+  final int uvIndex;
+
+  const _UVIndexCard({this.uvIndex = 0});
 
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     final tt = Theme.of(context).textTheme;
-    const uvIndex = 4;
+    final displayIndex = uvIndex.clamp(0, 10);
+    final label = _uvLabel(uvIndex);
 
     return Container(
       decoration: _cardDecoration(context),
@@ -473,7 +494,7 @@ class _UVIndexCard extends StatelessWidget {
               child: Row(
                 children: [
                   Flexible(
-                    flex: uvIndex,
+                    flex: displayIndex,
                     child: Container(
                       decoration: const BoxDecoration(
                         gradient: LinearGradient(
@@ -488,7 +509,7 @@ class _UVIndexCard extends StatelessWidget {
                     ),
                   ),
                   Flexible(
-                    flex: 10 - uvIndex,
+                    flex: 10 - displayIndex,
                     child: Container(color: Colors.red.withValues(alpha: 0.15)),
                   ),
                 ],
@@ -497,12 +518,20 @@ class _UVIndexCard extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            'Moderate',
+            label,
             style: tt.bodySmall?.copyWith(color: cs.onSurfaceVariant),
           ),
         ],
       ),
     );
+  }
+
+  String _uvLabel(int uv) {
+    if (uv <= 2) return 'Low';
+    if (uv <= 5) return 'Moderate';
+    if (uv <= 7) return 'High';
+    if (uv <= 10) return 'Very High';
+    return 'Extreme';
   }
 }
 
