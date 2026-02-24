@@ -1,8 +1,8 @@
+import 'package:aero_sense/core/constants/wmo_icons.dart';
+import 'package:aero_sense/core/controllers/weather_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
-import 'package:aero_sense/core/controllers/weather_controller.dart';
-import 'package:aero_sense/core/constants/wmo_icons.dart';
 
 class HourlyForecastList extends StatelessWidget {
   const HourlyForecastList({super.key});
@@ -33,11 +33,14 @@ class HourlyForecastList extends StatelessWidget {
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-                Text(
-                  'View All',
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: _activeColor,
-                    fontWeight: FontWeight.w500,
+                GestureDetector(
+                  onTap: () => Get.toNamed('/forecast-details'),
+                  child: Text(
+                    'View All',
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: _activeColor,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ),
               ],
