@@ -29,6 +29,10 @@ class WeatherAlertsController extends GetxController {
       'A line of severe thunderstorms will move east at '
       '45 mph. Wind gusts up to 60 mph are likely...';
 
+  // Alert location coordinates (San Francisco, CA)
+  final double alertLatitude = 37.7749;
+  final double alertLongitude = -122.4194;
+
   final RxBool isExpanded = false.obs;
 
   void toggleExpand() => isExpanded.toggle();

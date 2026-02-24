@@ -1,8 +1,9 @@
 import 'package:aero_sense/core/constants/app_constants.dart';
-import 'package:aero_sense/core/themes/app_theme.dart';
 import 'package:aero_sense/presentation/controllers/weather_alerts_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:get/get.dart';
+import 'package:latlong2/latlong.dart';
 
 class WeatherAlertsPage extends GetView<WeatherAlertsController> {
   const WeatherAlertsPage({super.key});
@@ -83,7 +84,7 @@ class _ActiveWarningCard extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 14),
-            const _MapPlaceholder(),
+            _AlertMap(controller: controller),
             const Padding(
               padding: EdgeInsets.symmetric(vertical: 14),
               child: Divider(height: 1),
@@ -202,29 +203,45 @@ class _LocationRow extends StatelessWidget {
   }
 }
 
-// ── Map Placeholder ───────────────────────────────────────────────────────────
+// ── Alert Map ─────────────────────────────────────────────────────────────
 
-class _MapPlaceholder extends StatelessWidget {
-  const _MapPlaceholder();
+class _AlertMap extends StatelessWidget {
+  final WeatherAlertsController controller;
+
+  const _AlertMap({required this.controller});
 
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
+    final center = LatLng(controller.alertLatitude, controller.alertLongitude);
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(AppConstants.cardRadius - 4),
       child: SizedBox(
         height: 160,
-        child: Stack(
-          fit: StackFit.expand,
+        child: FlutterMap(
+          options: MapOptions(
+            initialCenter: center,
+            initialZoom: 10,
+            interactionOptions: const InteractionOptions(
+              flags: InteractiveFlag.none,
+            ),
+          ),
           children: [
-            Row(
-              children: [
-                Expanded(flex: 2, child: ColoredBox(color: AppTheme.mapOcean)),
-                Expanded(flex: 3, child: ColoredBox(color: AppTheme.mapLand)),
+            TileLayer(
+              urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+              userAgentPackageName: 'com.aerosense.app',
+            ),
+            MarkerLayer(
+              markers: [
+                Marker(
+                  point: center,
+                  width: 36,
+                  height: 36,
+                  child: Icon(Icons.location_on, color: cs.error, size: 32),
+                ),
               ],
             ),
-            Center(child: Icon(Icons.location_on, color: cs.error, size: 32)),
           ],
         ),
       ),
