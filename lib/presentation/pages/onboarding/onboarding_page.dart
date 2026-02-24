@@ -65,12 +65,12 @@ class _OnboardingProgressDots extends StatelessWidget {
             borderRadius: BorderRadius.circular(4),
             boxShadow: isActive
                 ? [
-                    BoxShadow(
-                      color: AppColors.progressDotActive.withValues(alpha: 0.5),
-                      blurRadius: 4,
-                      offset: const Offset(0, 1),
-                    ),
-                  ]
+              BoxShadow(
+                color: AppColors.progressDotActive.withValues(alpha: 0.5),
+                blurRadius: 4,
+                offset: const Offset(0, 1),
+              ),
+            ]
                 : null,
           ),
         );

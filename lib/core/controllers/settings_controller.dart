@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:aero_sense/core/controllers/weather_controller.dart';
@@ -34,6 +35,7 @@ class SettingsController extends GetxController {
   set isDarkMode(bool value) {
     _isDarkMode.value = value;
     _storage.write('dark_mode', value);
+    Get.changeThemeMode(value ? ThemeMode.dark : ThemeMode.light);
   }
 
   set temperatureUnit(TemperatureUnit value) {
@@ -93,6 +95,7 @@ class SettingsController extends GetxController {
       // Load theme preference
       final darkMode = _storage.read('dark_mode') ?? false;
       _isDarkMode.value = darkMode;
+      Get.changeThemeMode(darkMode ? ThemeMode.dark : ThemeMode.light);
 
       // Load temperature unit
       final tempUnit = _storage.read('temperature_unit');
@@ -127,6 +130,7 @@ class SettingsController extends GetxController {
 
       // Reset to default values
       _isDarkMode.value = false;
+      Get.changeThemeMode(ThemeMode.light);
       _temperatureUnit.value = TemperatureUnit.celsius;
       _notificationsEnabled.value = true;
       _locationServicesEnabled.value = true;
@@ -255,6 +259,12 @@ class SettingsController extends GetxController {
   /// Enable or disable auto refresh
   void toggleAutoRefresh() {
     autoRefreshEnabled = !autoRefreshEnabled;
+  }
+
+  /// Logout and reset settings
+  void logout() {
+    resetToDefaults();
+    Get.offAllNamed('/onboarding');
   }
 
   /// Get system information for debugging
