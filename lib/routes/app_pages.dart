@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import '../presentation/pages/splash/splash_page.dart';
 import '../presentation/pages/onboarding/onboarding_page.dart';
 import '../presentation/pages/search/search_page.dart';
 import '../presentation/pages/dashboard/dashboard_page.dart';
@@ -14,9 +15,18 @@ import '../core/bindings/location_binding.dart';
 import '../core/bindings/settings_binding.dart';
 
 class AppPages {
-  static const initial = '/onboarding';
+  static const initial = '/splash';
 
   static final routes = [
+    // Splash - in-app animated loader, determines first launch vs returning
+    GetPage(
+      name: '/splash',
+      page: () => const SplashPage(),
+      transition: Transition.fadeIn,
+      transitionDuration: const Duration(milliseconds: 300),
+    ),
+
+    // Onboarding - 3-step PageView for first-launch experience
     // Weather Alerts - standalone for development/testing
     GetPage(
       name: '/weather-alerts',

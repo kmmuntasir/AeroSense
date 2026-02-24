@@ -105,7 +105,10 @@ class AppTheme {
           if (states.contains(WidgetState.selected)) return Colors.white;
           return Colors.white;
         }),
-      ),
+
+        ),
+
+
       cardTheme: CardThemeData(
         elevation: 2,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
