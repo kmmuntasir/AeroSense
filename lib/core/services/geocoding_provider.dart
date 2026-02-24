@@ -1,8 +1,8 @@
 import 'dart:math' as math;
 
-import 'package:dio/dio.dart';
 import 'package:aero_sense/core/models/geocoding_response.dart';
 import 'package:aero_sense/core/services/api_client.dart';
+import 'package:dio/dio.dart';
 
 class GeocodingProvider {
   final ApiClient _apiClient;
@@ -146,7 +146,7 @@ class GeocodingProvider {
         );
       }
 
-      return results.first;
+      return results;
     } catch (e) {
       if (e is ApiException) {
         rethrow;
