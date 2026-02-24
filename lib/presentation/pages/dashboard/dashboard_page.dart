@@ -78,15 +78,16 @@ class _DashboardTabState extends State<_DashboardTab> {
   }
 
   void _fetchWeather() {
-    if (_weatherController.currentWeather != null) return;
-
     if (_location != null) {
+      // Explicit city selected from search — clear stale data then fetch fresh.
+      _weatherController.clearCurrentWeather();
       _weatherController.fetchWeatherForLocation(
         latitude: _location.latitude,
         longitude: _location.longitude,
         locationName: _location.name,
       );
-    } else {
+    } else if (_weatherController.currentWeather == null) {
+      // GPS-based — only fetch if no data exists yet.
       _weatherController.fetchCurrentWeather();
     }
   }
@@ -101,10 +102,11 @@ class _DashboardTabState extends State<_DashboardTab> {
         elevation: 0,
         automaticallyImplyLeading: false,
         title: Obx(() {
-          final name =
-              _location?.name ??
-              _locationController.currentLocationAsGeocodingResult?.name ??
-              'AeroSense';
+          // Always read the reactive GPS name so Obx keeps its subscription
+          // even when _location is non-null (avoids "improper use" warning).
+          final gpsName =
+              _locationController.currentLocationAsGeocodingResult?.name;
+          final name = _location?.name ?? gpsName ?? 'AeroSense';
           return Row(
             mainAxisSize: MainAxisSize.min,
             children: [

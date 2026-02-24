@@ -9,6 +9,9 @@ class LocationsController extends GetxController {
   final WeatherController _weatherController = Get.find<WeatherController>();
 
   final RxBool isLoadingWeather = false.obs;
+  final RxBool isFetchingCurrentPosition = false.obs;
+
+  bool get hasLocationPermission => _locationController.hasPermission;
 
   List<GeocodingResult> get savedLocations =>
       _locationController.savedLocations;
@@ -21,7 +24,18 @@ class LocationsController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    _ensureCurrentLocation();
     _loadSavedWeather();
+  }
+
+  /// Fetch GPS position if not yet available so the current-location card
+  /// has data to display as soon as the Locations tab is opened.
+  Future<void> _ensureCurrentLocation() async {
+    if (_locationController.currentPosition != null) return;
+    if (!_locationController.hasPermission) return;
+    isFetchingCurrentPosition.value = true;
+    await _locationController.getCurrentLocation();
+    isFetchingCurrentPosition.value = false;
   }
 
   Future<void> _loadSavedWeather() async {

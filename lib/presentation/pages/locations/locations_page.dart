@@ -94,13 +94,17 @@ class LocationsPage extends StatelessWidget {
               // Current location card
               Obx(() {
                 final loc = controller.currentLocation;
-                final weather = controller.currentWeather;
-                if (loc == null) return const _CardShimmer();
-                return _CurrentLocationCard(
-                  location: loc,
-                  weather: weather,
-                  controller: controller,
-                );
+                if (loc != null) {
+                  return _CurrentLocationCard(
+                    location: loc,
+                    weather: controller.currentWeather,
+                    controller: controller,
+                  );
+                }
+                if (controller.isFetchingCurrentPosition.value) {
+                  return const _CardShimmer();
+                }
+                return const _NoLocationCard();
               }),
 
               const SizedBox(height: 24),
@@ -456,6 +460,56 @@ class _WeatherIcon extends StatelessWidget {
   Widget build(BuildContext context) {
     final (:icon, :color) = _weatherIconFor(code);
     return Icon(icon, size: 22, color: color);
+  }
+}
+
+// ── No location card ─────────────────────────────────────────────────────────
+
+class _NoLocationCard extends StatelessWidget {
+  const _NoLocationCard();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: _cardRadius,
+        boxShadow: _cardShadow,
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      child: const Row(
+        children: [
+          _LocationCircleIcon(
+            icon: Icons.location_off_rounded,
+            iconColor: AppColors.textSecondary,
+          ),
+          SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Location Unavailable',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+                SizedBox(height: 2),
+                Text(
+                  'Enable location access in settings',
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 
