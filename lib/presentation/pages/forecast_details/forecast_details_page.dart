@@ -17,88 +17,89 @@ class ForecastDetailsPage extends GetView<ForecastDetailsController> {
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Get.back(),
         ),
-        title: const Text('Detailed Forecast'),
+        title: Obx(
+          () => Text(
+            controller.forecast != null
+                ? _formatDate(controller.forecast!.daily.dates.firstOrNull)
+                : 'Monday, Oct 24',
+          ),
+        ),
+        centerTitle: true,
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: () => controller.refreshForecast(),
+            icon: const Icon(Icons.share_outlined),
+            onPressed: () {},
           ),
         ],
       ),
       bottomNavigationBar: const CommonBottomNav(selectedIndex: 3),
       body: Obx(
-        () => controller.isLoading
-            ? const Center(child: CircularProgressIndicator.adaptive())
-            : controller.errorMessage.isNotEmpty
-                ? _ErrorState(errorMessage: controller.errorMessage)
-                : RefreshIndicator(
-                    onRefresh: () => controller.refreshForecast(),
-                    child: ListView(
-                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
-                      children: [
-                        _CurrentWeatherCard(controller: controller),
-                        const SizedBox(height: 20),
-                        _ForecastTabSelector(controller: controller),
-                        const SizedBox(height: 16),
-                        Obx(
-                          () {
-                            switch (controller.selectedTab) {
-                              case ForecastTab.hourly:
-                                return _HourlyForecastList(
-                                  hourlyData: controller.hourlyForecast,
-                                  controller: controller,
-                                );
-                              case ForecastTab.daily:
-                                return _DailyForecastList(
-                                  dailyData: controller.dailyForecast,
-                                  controller: controller,
-                                );
-                              case ForecastTab.extended:
-                                return _ExtendedForecastList(
-                                  dailyData: controller.dailyForecast,
-                                  controller: controller,
-                                );
-                            }
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
+        () {
+          if (controller.isLoading && controller.forecast == null) {
+            return const Center(child: CircularProgressIndicator.adaptive());
+          }
+
+          if (controller.errorMessage.isNotEmpty && controller.forecast == null) {
+            return _ErrorState(errorMessage: controller.errorMessage);
+          }
+
+          final forecast = controller.forecast;
+          if (forecast == null) {
+            return const Center(child: Text('No forecast data available'));
+          }
+
+          return RefreshIndicator(
+            onRefresh: () => controller.refreshForecast(),
+            child: ListView(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
+              children: [
+                _CurrentWeatherCard(forecast: forecast),
+                const SizedBox(height: 24),
+                _DetailStatsGrid(forecast: forecast),
+                const SizedBox(height: 24),
+                _ChanceOfRainSection(forecast: forecast),
+                const SizedBox(height: 24),
+                _TemperatureTrendChart(forecast: forecast),
+              ],
+            ),
+          );
+        },
       ),
     );
   }
+
+  String _formatDate(DateTime? date) {
+    if (date == null) return 'Monday, Oct 24';
+    final days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+    final months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    return '${days[date.weekday - 1]}, ${months[date.month - 1]} ${date.day}';
+  }
 }
 
-// ── Current Weather Card ───────────────────────────────────────────────────
+// ── Current Weather Card ────────────────────────────────────────────────────
 
 class _CurrentWeatherCard extends StatelessWidget {
-  final ForecastDetailsController controller;
+  final ForecastResponse forecast;
 
-  const _CurrentWeatherCard({required this.controller});
+  const _CurrentWeatherCard({required this.forecast});
 
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     final tt = Theme.of(context).textTheme;
-    final current = controller.currentWeather;
-
-    if (current == null) return const SizedBox.shrink();
+    final current = forecast.current;
+    final firstDaily = forecast.daily.getDaysAhead(1).firstOrNull;
 
     return Container(
       decoration: BoxDecoration(
-        color: cs.primary.withValues(alpha: 0.1),
+        color: cs.primary.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(AppConstants.cardRadius),
-        border: Border.all(color: cs.primary.withValues(alpha: 0.3)),
+        border: Border.all(color: cs.primary.withValues(alpha: 0.2)),
       ),
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Right Now',
-            style: tt.labelLarge?.copyWith(color: cs.onSurfaceVariant),
-          ),
-          const SizedBox(height: 8),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -107,236 +108,187 @@ class _CurrentWeatherCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '${current.temperature.toStringAsFixed(0)}°F',
-                      style: tt.displayMedium?.copyWith(fontWeight: FontWeight.bold),
+                      '${current.temperature.toStringAsFixed(0)}°',
+                      style: tt.displayLarge?.copyWith(fontWeight: FontWeight.bold),
                     ),
+                    const SizedBox(height: 4),
                     Text(
-                      'Feels like ${current.apparentTemperature.toStringAsFixed(0)}°F',
-                      style: tt.bodyMedium?.copyWith(color: cs.onSurfaceVariant),
+                      _getWeatherCondition(current.weatherCode),
+                      style: tt.bodyMedium?.copyWith(color: cs.primary),
                     ),
+                    const SizedBox(height: 2),
+                    if (firstDaily != null)
+                      Text(
+                        'H:${firstDaily.maxTemperature.toStringAsFixed(0)}° L:${firstDaily.minTemperature.toStringAsFixed(0)}°',
+                        style: tt.labelMedium,
+                      ),
                   ],
                 ),
               ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Icon(Icons.wind_power, size: 24, color: cs.primary),
-                  const SizedBox(height: 4),
-                  Text(
-                    '${current.windSpeed.toStringAsFixed(0)} mph',
-                    style: tt.labelMedium,
-                  ),
-                ],
-              ),
+              _WeatherIcon(weatherCode: current.weatherCode),
             ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 16),
           Text(
-            controller.getWeatherCondition(current.weatherCode),
+            'Feels like ${current.apparentTemperature.toStringAsFixed(0)}°',
             style: tt.bodyMedium?.copyWith(color: cs.onSurfaceVariant),
           ),
-        ],
-      ),
-    );
-  }
-}
-
-// ── Forecast Tab Selector ──────────────────────────────────────────────────
-
-class _ForecastTabSelector extends StatelessWidget {
-  final ForecastDetailsController controller;
-
-  const _ForecastTabSelector({required this.controller});
-
-  @override
-  Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-
-    return Obx(
-      () => Row(
-        children: [
-          _TabButton(
-            label: 'Hourly',
-            isSelected: controller.selectedTab == ForecastTab.hourly,
-            onTap: () => controller.selectTab(ForecastTab.hourly),
-            colorScheme: cs,
-          ),
-          const SizedBox(width: 8),
-          _TabButton(
-            label: 'Daily',
-            isSelected: controller.selectedTab == ForecastTab.daily,
-            onTap: () => controller.selectTab(ForecastTab.daily),
-            colorScheme: cs,
-          ),
-          const SizedBox(width: 8),
-          _TabButton(
-            label: 'Extended',
-            isSelected: controller.selectedTab == ForecastTab.extended,
-            onTap: () => controller.selectTab(ForecastTab.extended),
-            colorScheme: cs,
+          const SizedBox(height: 12),
+          Text(
+            _getWeatherDescription(current.weatherCode),
+            style: tt.bodyMedium?.copyWith(
+              height: 1.6,
+              color: cs.onSurfaceVariant,
+            ),
           ),
         ],
       ),
     );
   }
-}
 
-class _TabButton extends StatelessWidget {
-  final String label;
-  final bool isSelected;
-  final VoidCallback onTap;
-  final ColorScheme colorScheme;
-
-  const _TabButton({
-    required this.label,
-    required this.isSelected,
-    required this.onTap,
-    required this.colorScheme,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      child: GestureDetector(
-        onTap: onTap,
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          decoration: BoxDecoration(
-            color: isSelected ? colorScheme.primary : colorScheme.surfaceContainer,
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Text(
-            label,
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                  color: isSelected ? colorScheme.onPrimary : colorScheme.onSurfaceVariant,
-                  fontWeight: FontWeight.w500,
-                ),
-          ),
-        ),
-      ),
-    );
+  String _getWeatherCondition(int code) {
+    if (code == 0 || code == 1) return 'Sunny';
+    if (code == 2) return 'Partly Cloudy';
+    if (code == 3) return 'Overcast';
+    if (code == 45 || code == 48) return 'Foggy';
+    if ((code >= 51 && code <= 67) || (code >= 80 && code <= 82)) return 'Rainy';
+    if (code >= 71 && code <= 77) return 'Snowy';
+    if (code >= 90 && code <= 99) return 'Thunderstorm';
+    return 'Clear';
   }
-}
 
-// ── Hourly Forecast List ───────────────────────────────────────────────────
-
-class _HourlyForecastList extends StatelessWidget {
-  final List<HourlyData> hourlyData;
-  final ForecastDetailsController controller;
-
-  const _HourlyForecastList({
-    required this.hourlyData,
-    required this.controller,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    if (hourlyData.isEmpty) {
-      return const Center(child: Text('No hourly data available'));
+  String _getWeatherDescription(int code) {
+    if (code == 0 || code == 1) {
+      return 'Clear skies with excellent visibility. Perfect conditions for activities.';
+    } else if (code == 2) {
+      return 'Mix of sun and clouds with a slight breeze. Perfect conditions for flight visibility.';
+    } else if (code == 3) {
+      return 'Overcast conditions but no precipitation expected.';
+    } else if (code >= 51 && code <= 67) {
+      return 'Light to moderate drizzle or rain expected. Conditions suitable for most activities.';
+    } else if (code >= 71 && code <= 77) {
+      return 'Moderate to heavy snow expected. Exercise caution in hazardous conditions.';
     }
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Next 24 Hours',
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: 12),
-        SizedBox(
-          height: 120,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            itemCount: hourlyData.length,
-            itemBuilder: (context, index) {
-              final data = hourlyData[index];
-              return _HourlyCard(data: data, controller: controller);
-            },
-          ),
-        ),
-      ],
-    );
+    return 'Current weather conditions active.';
   }
 }
 
-class _HourlyCard extends StatelessWidget {
-  final HourlyData data;
-  final ForecastDetailsController controller;
+// ── Weather Icon ────────────────────────────────────────────────────────────
 
-  const _HourlyCard({required this.data, required this.controller});
+class _WeatherIcon extends StatelessWidget {
+  final int weatherCode;
+
+  const _WeatherIcon({required this.weatherCode});
 
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    final tt = Theme.of(context).textTheme;
+    IconData icon = Icons.cloud;
+    Color color = cs.primary;
+
+    if (weatherCode == 0) {
+      icon = Icons.sunny;
+      color = Colors.amber;
+    } else if (weatherCode == 1 || weatherCode == 2) {
+      icon = Icons.wb_sunny;
+      color = Colors.orange;
+    } else if (weatherCode == 3) {
+      icon = Icons.cloud;
+    } else if (weatherCode >= 51 && weatherCode <= 67) {
+      icon = Icons.water_drop;
+      color = cs.primary;
+    } else if (weatherCode >= 71 && weatherCode <= 77) {
+      icon = Icons.ac_unit;
+      color = Colors.lightBlue;
+    }
 
     return Container(
       width: 80,
-      margin: const EdgeInsets.only(right: 8),
+      height: 80,
       decoration: BoxDecoration(
-        color: cs.surfaceContainer,
-        borderRadius: BorderRadius.circular(12),
+        color: color.withValues(alpha: 0.1),
+        shape: BoxShape.circle,
       ),
-      padding: const EdgeInsets.all(8),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          Text(
-            data.formattedTime,
-            style: tt.labelSmall?.copyWith(fontWeight: FontWeight.w500),
-          ),
-          Icon(Icons.cloud, size: 20, color: cs.primary),
-          Text(
-            '${data.temperature.toStringAsFixed(0)}°',
-            style: tt.labelMedium?.copyWith(fontWeight: FontWeight.bold),
-          ),
-          Text(
-            '${data.precipitationProbability.toStringAsFixed(0)}%',
-            style: tt.labelSmall?.copyWith(color: cs.onSurfaceVariant),
-          ),
-        ],
-      ),
+      child: Icon(icon, size: 40, color: color),
     );
   }
 }
 
-// ── Daily Forecast List ────────────────────────────────────────────────────
+// ── Detail Stats Grid ───────────────────────────────────────────────────────
 
-class _DailyForecastList extends StatelessWidget {
-  final List<DailyData> dailyData;
-  final ForecastDetailsController controller;
+class _DetailStatsGrid extends StatelessWidget {
+  final ForecastResponse forecast;
 
-  const _DailyForecastList({
-    required this.dailyData,
-    required this.controller,
-  });
+  const _DetailStatsGrid({required this.forecast});
 
   @override
   Widget build(BuildContext context) {
-    if (dailyData.isEmpty) {
-      return const Center(child: Text('No daily data available'));
-    }
+    final firstHourly = forecast.hourly.getHoursAhead(24).firstOrNull;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return GridView.count(
+      crossAxisCount: 2,
+      crossAxisSpacing: 12,
+      mainAxisSpacing: 12,
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
       children: [
-        Text(
-          'Next 7 Days',
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+        _StatCard(
+          icon: Icons.opacity_outlined,
+          label: 'HUMIDITY',
+          value: firstHourly?.relativeHumidity.toString() ?? '45',
+          unit: '%',
+          subtitle: firstHourly != null ? 'Dew Point is ${_calculateDewPoint(firstHourly)}°' : 'Dew Point is 58°',
         ),
-        const SizedBox(height: 12),
-        ...dailyData.map((data) => _DailyRow(data: data, controller: controller)),
+        _StatCard(
+          icon: Icons.wb_sunny_outlined,
+          label: 'UV INDEX',
+          value: '4',
+          unit: '',
+          subtitle: 'Moderate',
+        ),
+        _StatCard(
+          icon: Icons.visibility_outlined,
+          label: 'VISIBILITY',
+          value: '10',
+          unit: 'mi',
+          subtitle: 'Clear view',
+        ),
+        _StatCard(
+          icon: Icons.air_outlined,
+          label: 'PRESSURE',
+          value: (firstHourly?.pressure.toStringAsFixed(0) ?? '1012'),
+          unit: 'hPa',
+          subtitle: 'Stable',
+        ),
       ],
     );
   }
+
+  String _calculateDewPoint(HourlyData hourly) {
+    final temp = hourly.temperature;
+    final humidity = hourly.relativeHumidity;
+    final a = 17.27;
+    final b = 237.7;
+    final alpha = ((a * temp) / (b + temp)) + (humidity / 100).log();
+    final dewPoint = (b * alpha) / (a - alpha);
+    return dewPoint.toStringAsFixed(0);
+  }
 }
 
-class _DailyRow extends StatelessWidget {
-  final DailyData data;
-  final ForecastDetailsController controller;
+class _StatCard extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String value;
+  final String unit;
+  final String subtitle;
 
-  const _DailyRow({required this.data, required this.controller});
+  const _StatCard({
+    required this.icon,
+    required this.label,
+    required this.value,
+    required this.unit,
+    required this.subtitle,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -344,64 +296,117 @@ class _DailyRow extends StatelessWidget {
     final tt = Theme.of(context).textTheme;
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: cs.surface,
         borderRadius: BorderRadius.circular(AppConstants.cardRadius),
-        border: Border.all(color: cs.outlineVariant.withValues(alpha: 0.5)),
+        border: Border.all(color: cs.outlineVariant.withValues(alpha: 0.3)),
       ),
-      child: Row(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Expanded(
-            flex: 2,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  data.formattedDate,
-                  style: tt.labelMedium?.copyWith(fontWeight: FontWeight.w500),
+          Row(
+            children: [
+              Icon(icon, size: 18, color: cs.primary),
+              const SizedBox(width: 8),
+              Text(
+                label,
+                style: tt.labelSmall?.copyWith(
+                  color: cs.primary,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 0.5,
                 ),
-                Text(
-                  controller.getWeatherCondition(data.weatherCode),
-                  style: tt.bodySmall?.copyWith(color: cs.onSurfaceVariant),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
-          Expanded(
-            flex: 1,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      '${data.maxTemperature.toStringAsFixed(0)}°',
-                      style: tt.labelMedium?.copyWith(fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      '${data.minTemperature.toStringAsFixed(0)}°',
-                      style: tt.labelSmall?.copyWith(color: cs.onSurfaceVariant),
-                    ),
-                  ],
+          const SizedBox(height: 12),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.baseline,
+            textBaseline: TextBaseline.alphabetic,
+            children: [
+              Text(
+                value,
+                style: tt.displaySmall?.copyWith(fontWeight: FontWeight.bold),
+              ),
+              if (unit.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(left: 4),
+                  child: Text(
+                    unit,
+                    style: tt.bodySmall,
+                  ),
                 ),
-              ],
-            ),
+            ],
           ),
-          Expanded(
-            flex: 1,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Icon(Icons.opacity, size: 16, color: cs.primary),
-                Text(
-                  '${data.precipitationProbability}%',
-                  style: tt.labelSmall,
+          const SizedBox(height: 4),
+          Text(
+            subtitle,
+            style: tt.bodySmall?.copyWith(color: cs.onSurfaceVariant),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Chance of Rain Section ──────────────────────────────────────────────────
+
+class _ChanceOfRainSection extends StatelessWidget {
+  final ForecastResponse forecast;
+
+  const _ChanceOfRainSection({required this.forecast});
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final tt = Theme.of(context).textTheme;
+    final firstDaily = forecast.daily.getDaysAhead(1).firstOrNull;
+    final precipChance = firstDaily?.precipitationProbability ?? 30;
+
+    return Container(
+      decoration: BoxDecoration(
+        color: cs.surface,
+        borderRadius: BorderRadius.circular(AppConstants.cardRadius),
+        border: Border.all(color: cs.outlineVariant.withValues(alpha: 0.3)),
+      ),
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.water_drop_outlined, size: 18, color: cs.primary),
+              const SizedBox(width: 8),
+              Text(
+                'CHANCE OF RAIN',
+                style: tt.labelSmall?.copyWith(
+                  color: cs.primary,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 0.5,
                 ),
-              ],
+              ),
+              const Spacer(),
+              Container(
+                decoration: BoxDecoration(
+                  color: cs.primary.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                child: Text(
+                  '$precipChance% Peak',
+                  style: tt.labelSmall?.copyWith(color: cs.primary),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(4),
+            child: LinearProgressIndicator(
+              value: precipChance / 100,
+              minHeight: 6,
+              backgroundColor: cs.outlineVariant.withValues(alpha: 0.2),
+              valueColor: AlwaysStoppedAnimation<Color>(cs.primary),
             ),
           ),
         ],
@@ -410,54 +415,101 @@ class _DailyRow extends StatelessWidget {
   }
 }
 
-// ── Extended Forecast List ─────────────────────────────────────────────────
+// ── Temperature Trend Chart ─────────────────────────────────────────────────
 
-class _ExtendedForecastList extends StatelessWidget {
-  final List<DailyData> dailyData;
-  final ForecastDetailsController controller;
+class _TemperatureTrendChart extends StatelessWidget {
+  final ForecastResponse forecast;
 
-  const _ExtendedForecastList({
-    required this.dailyData,
-    required this.controller,
-  });
+  const _TemperatureTrendChart({required this.forecast});
 
   @override
   Widget build(BuildContext context) {
-    if (dailyData.isEmpty) {
-      return Center(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            children: [
-              Icon(Icons.calendar_month, size: 48, color: Theme.of(context).colorScheme.primary),
-              const SizedBox(height: 16),
-              const Text('Extended forecast loading...'),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: () => controller.fetchExtendedForecast(),
-                child: const Text('Load Extended Forecast'),
-              ),
-            ],
-          ),
-        ),
-      );
+    final cs = Theme.of(context).colorScheme;
+    final hourlyData = forecast.hourly.getHoursAhead(24);
+
+    if (hourlyData.isEmpty) {
+      return const SizedBox.shrink();
     }
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Extended Forecast (7-14 Days)',
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+    final minTemp = hourlyData.map((e) => e.temperature).reduce((a, b) => a < b ? a : b);
+    final maxTemp = hourlyData.map((e) => e.temperature).reduce((a, b) => a > b ? a : b);
+    final range = maxTemp - minTemp + 2;
+
+    return Container(
+      height: 120,
+      decoration: BoxDecoration(
+        color: cs.surface,
+        borderRadius: BorderRadius.circular(AppConstants.cardRadius),
+        border: Border.all(color: cs.outlineVariant.withValues(alpha: 0.3)),
+      ),
+      padding: const EdgeInsets.all(16),
+      child: CustomPaint(
+        painter: _TrendChartPainter(
+          data: hourlyData,
+          minTemp: minTemp,
+          range: range,
+          color: cs.primary,
         ),
-        const SizedBox(height: 12),
-        ...dailyData.map((data) => _DailyRow(data: data, controller: controller)),
-      ],
+      ),
     );
   }
 }
 
-// ── Error State ────────────────────────────────────────────────────────────
+class _TrendChartPainter extends CustomPainter {
+  final List<HourlyData> data;
+  final double minTemp;
+  final double range;
+  final Color color;
+
+  _TrendChartPainter({
+    required this.data,
+    required this.minTemp,
+    required this.range,
+    required this.color,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    if (data.isEmpty) return;
+
+    final paint = Paint()
+      ..color = color
+      ..strokeWidth = 3
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round;
+
+    final path = Path();
+    final pointSpacing = size.width / (data.length - 1);
+
+    for (int i = 0; i < data.length; i++) {
+      final x = i * pointSpacing;
+      final y = size.height - ((data[i].temperature - minTemp) / range * size.height);
+
+      if (i == 0) {
+        path.moveTo(x, y);
+      } else {
+        path.lineTo(x, y);
+      }
+    }
+
+    canvas.drawPath(path, paint);
+
+    final pointPaint = Paint()
+      ..color = color
+      ..style = PaintingStyle.fill;
+
+    for (int i = 0; i < data.length; i += 4) {
+      final x = i * pointSpacing;
+      final y = size.height - ((data[i].temperature - minTemp) / range * size.height);
+      canvas.drawCircle(Offset(x, y), 4, pointPaint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(_TrendChartPainter oldDelegate) => false;
+}
+
+// ── Error State ─────────────────────────────────────────────────────────────
 
 class _ErrorState extends StatelessWidget {
   final String errorMessage;
