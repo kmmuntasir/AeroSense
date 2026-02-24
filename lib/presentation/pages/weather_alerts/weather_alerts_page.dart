@@ -1,8 +1,9 @@
 import 'package:aero_sense/core/constants/app_constants.dart';
-import 'package:aero_sense/core/themes/app_theme.dart';
 import 'package:aero_sense/presentation/controllers/weather_alerts_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:get/get.dart';
+import 'package:latlong2/latlong.dart';
 
 class WeatherAlertsPage extends GetView<WeatherAlertsController> {
   const WeatherAlertsPage({super.key});
@@ -18,15 +19,22 @@ class WeatherAlertsPage extends GetView<WeatherAlertsController> {
         ),
         title: const Text('Weather Alerts'),
       ),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
-        children: [
-          _ActiveWarningCard(controller: controller),
-          const SizedBox(height: 28),
-          _PastAlertsSection(alerts: controller.pastAlerts),
-          const SizedBox(height: 24),
-          _ManageNotificationsLink(),
-        ],
+      body: Obx(
+        () => controller.isLoading
+            ? const Center(child: CircularProgressIndicator.adaptive())
+            : controller.errorMessage.isNotEmpty
+            ? _ErrorState(errorMessage: controller.errorMessage)
+            : ListView(
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
+                children: [
+                  if (controller.activeAlert != null)
+                    _ActiveWarningCard(controller: controller)
+                  else
+                    _NoAlertsState(),
+                  const SizedBox(height: 28),
+                  _PastAlertsSection(alerts: controller.pastAlerts),
+                ],
+              ),
       ),
     );
   }
@@ -44,56 +52,57 @@ class _ActiveWarningCard extends StatelessWidget {
     final cs = Theme.of(context).colorScheme;
     final tt = Theme.of(context).textTheme;
 
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(AppConstants.cardRadius),
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [cs.onError, cs.errorContainer],
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: cs.onError.withAlpha(50),
-            blurRadius: 16,
-            spreadRadius: 1,
-          ),
-        ],
-      ),
-      padding: const EdgeInsets.all(1.5),
-      child: Container(
+    return Obx(
+      () => Container(
         decoration: BoxDecoration(
-          color: cs.surface,
-          borderRadius: BorderRadius.circular(AppConstants.cardRadius - 1.5),
-        ),
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _AlertHeader(controller: controller),
-            const SizedBox(height: 10),
-
-            _LocationRow(controller: controller),
-            const SizedBox(height: 12),
-            Text(
-              controller.alertDescription,
-              style: tt.bodyMedium?.copyWith(
-                color: cs.onSurfaceVariant,
-                height: 1.5,
-              ),
+          borderRadius: BorderRadius.circular(AppConstants.cardRadius),
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [cs.onError, cs.errorContainer],
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: cs.onError.withAlpha(50),
+              blurRadius: 16,
+              spreadRadius: 1,
             ),
-            const SizedBox(height: 14),
-            const _MapPlaceholder(),
-            const Padding(
-              padding: EdgeInsets.symmetric(vertical: 14),
-              child: Divider(height: 1),
-            ),
-            _MoreDetailsRow(controller: controller),
-            const SizedBox(height: 10),
-            _NwsCard(controller: controller),
-            const SizedBox(height: 16),
-            _ReadReportButton(),
           ],
+        ),
+        padding: const EdgeInsets.all(1.5),
+        child: Container(
+          decoration: BoxDecoration(
+            color: cs.surface,
+            borderRadius: BorderRadius.circular(AppConstants.cardRadius - 1.5),
+          ),
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _AlertHeader(controller: controller),
+              const SizedBox(height: 10),
+              _LocationRow(controller: controller),
+              const SizedBox(height: 12),
+              Text(
+                controller.alertDescription,
+                style: tt.bodyMedium?.copyWith(
+                  color: cs.onSurfaceVariant,
+                  height: 1.5,
+                ),
+              ),
+              const SizedBox(height: 14),
+              _AlertMap(controller: controller),
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 14),
+                child: Divider(height: 1),
+              ),
+              _MoreDetailsRow(controller: controller),
+              const SizedBox(height: 10),
+              _NwsCard(controller: controller),
+              const SizedBox(height: 16),
+              _ReadReportButton(),
+            ],
+          ),
         ),
       ),
     );
@@ -202,29 +211,45 @@ class _LocationRow extends StatelessWidget {
   }
 }
 
-// ── Map Placeholder ───────────────────────────────────────────────────────────
+// ── Alert Map ─────────────────────────────────────────────────────────────
 
-class _MapPlaceholder extends StatelessWidget {
-  const _MapPlaceholder();
+class _AlertMap extends StatelessWidget {
+  final WeatherAlertsController controller;
+
+  const _AlertMap({required this.controller});
 
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
+    final center = LatLng(controller.alertLatitude, controller.alertLongitude);
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(AppConstants.cardRadius - 4),
       child: SizedBox(
         height: 160,
-        child: Stack(
-          fit: StackFit.expand,
+        child: FlutterMap(
+          options: MapOptions(
+            initialCenter: center,
+            initialZoom: 10,
+            interactionOptions: const InteractionOptions(
+              flags: InteractiveFlag.none,
+            ),
+          ),
           children: [
-            Row(
-              children: [
-                Expanded(flex: 2, child: ColoredBox(color: AppTheme.mapOcean)),
-                Expanded(flex: 3, child: ColoredBox(color: AppTheme.mapLand)),
+            TileLayer(
+              urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+              userAgentPackageName: 'com.aerosense.app',
+            ),
+            MarkerLayer(
+              markers: [
+                Marker(
+                  point: center,
+                  width: 36,
+                  height: 36,
+                  child: Icon(Icons.location_on, color: cs.error, size: 32),
+                ),
               ],
             ),
-            Center(child: Icon(Icons.location_on, color: cs.error, size: 32)),
           ],
         ),
       ),
@@ -389,48 +414,97 @@ class _PastAlertRow extends StatelessWidget {
     final cs = Theme.of(context).colorScheme;
     final tt = Theme.of(context).textTheme;
 
-    return Card(
-      elevation: 1.5,
-      shape: RoundedRectangleBorder(
+    return Container(
+      decoration: BoxDecoration(
+        color: cs.surface,
         borderRadius: BorderRadius.circular(AppConstants.cardRadius),
+        boxShadow: [
+          BoxShadow(
+            color: cs.shadow.withValues(alpha: 0.08),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      child: Row(
+        children: [
+          Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(
+              color: cs.surfaceContainer,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(alert.icon, size: 18, color: cs.onSurfaceVariant),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  alert.title,
+                  style: tt.bodyLarge?.copyWith(fontWeight: FontWeight.w500),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  alert.location,
+                  style: tt.bodySmall?.copyWith(color: cs.onSurfaceVariant),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          Text(
+            'Expired',
+            style: tt.labelSmall?.copyWith(
+              color: cs.onSurfaceVariant,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Error State ────────────────────────────────────────────────────────────
+
+class _ErrorState extends StatelessWidget {
+  final String errorMessage;
+
+  const _ErrorState({required this.errorMessage});
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final tt = Theme.of(context).textTheme;
+
+    return Center(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        child: Row(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Container(
-              width: 36,
-              height: 36,
-              decoration: BoxDecoration(
-                color: cs.surfaceContainer,
-                shape: BoxShape.circle,
-              ),
-              child: Icon(alert.icon, size: 18, color: cs.onSurfaceVariant),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    alert.title,
-                    style: tt.bodyLarge?.copyWith(fontWeight: FontWeight.w500),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    alert.location,
-                    style: tt.bodySmall?.copyWith(color: cs.onSurfaceVariant),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(width: 8),
+            Icon(Icons.warning_outlined, size: 48, color: cs.error),
+            const SizedBox(height: 16),
             Text(
-              'Expired',
-              style: tt.labelSmall?.copyWith(
-                color: cs.onSurfaceVariant,
-                fontWeight: FontWeight.w500,
-              ),
+              'Failed to Load Alerts',
+              style: tt.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              errorMessage,
+              textAlign: TextAlign.center,
+              style: tt.bodyMedium?.copyWith(color: cs.onSurfaceVariant),
+            ),
+            const SizedBox(height: 24),
+            ElevatedButton.icon(
+              onPressed: () =>
+                  Get.find<WeatherAlertsController>().refreshAlerts(),
+              icon: const Icon(Icons.refresh),
+              label: const Text('Retry'),
             ),
           ],
         ),
@@ -439,31 +513,40 @@ class _PastAlertRow extends StatelessWidget {
   }
 }
 
-// ── Manage Notifications Link ─────────────────────────────────────────────────
+// ── No Alerts State ───────────────────────────────────────────────────────
 
-class _ManageNotificationsLink extends StatelessWidget {
-  const _ManageNotificationsLink();
+class _NoAlertsState extends StatelessWidget {
+  const _NoAlertsState();
 
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     final tt = Theme.of(context).textTheme;
 
-    return GestureDetector(
-      onTap: () {},
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            'Manage Alert Notifications',
-            style: tt.bodyMedium?.copyWith(
-              color: cs.primary,
-              fontWeight: FontWeight.w500,
+    return Card(
+      elevation: 1.5,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppConstants.cardRadius),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.check_circle_outline, size: 56, color: cs.primary),
+            const SizedBox(height: 16),
+            Text(
+              'No Active Alerts',
+              style: tt.titleLarge?.copyWith(fontWeight: FontWeight.bold),
             ),
-          ),
-          const SizedBox(width: 4),
-          Icon(Icons.arrow_forward, size: 16, color: cs.primary),
-        ],
+            const SizedBox(height: 8),
+            Text(
+              'There are currently no weather alerts for your location.',
+              textAlign: TextAlign.center,
+              style: tt.bodyMedium?.copyWith(color: cs.onSurfaceVariant),
+            ),
+          ],
+        ),
       ),
     );
   }
