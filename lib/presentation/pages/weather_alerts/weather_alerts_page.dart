@@ -14,10 +14,7 @@ class WeatherAlertsPage extends GetView<WeatherAlertsController> {
     return Scaffold(
       appBar: AppBar(
         scrolledUnderElevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Get.back(),
-        ),
+        automaticallyImplyLeading: false,
         title: const Text('Weather Alerts'),
       ),
       bottomNavigationBar: const CommonBottomNav(selectedIndex: 2),

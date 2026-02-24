@@ -21,7 +21,7 @@ class SettingsPage extends GetView<SettingsController> {
         backgroundColor: cs.surfaceContainer,
         title: const Text('Settings'),
       ),
-      bottomNavigationBar: const CommonBottomNav(selectedIndex: 4),
+      bottomNavigationBar: const CommonBottomNav(selectedIndex: 3),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
@@ -29,11 +29,7 @@ class SettingsPage extends GetView<SettingsController> {
             // ── Units ─────────────────────────────────────
             const _SectionLabel(label: 'UNITS'),
             const SizedBox(height: 8),
-            _SettingsCard(
-              children: [
-                _TemperatureRow(controller: controller),
-              ],
-            ),
+            _SettingsCard(children: [_TemperatureRow(controller: controller)]),
             const SizedBox(height: 24),
 
             // ── Appearance ────────────────────────────────
