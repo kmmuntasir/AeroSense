@@ -321,8 +321,8 @@ class _DetailStatsGrid extends StatelessWidget {
     final pressureValue = hourly?.pressure ?? 1012.0;
     final dewPoint = hourly != null ? _dewPoint(hourly) : '58';
     final uvIndex = hourly?.uvIndex.round() ?? 0;
-    final visibilityKm = (hourly?.visibility ?? 10000.0) / 1000;
-    final visibilityLabel = _visibilityLabel(visibilityKm);
+    final visibilityMiles = (hourly?.visibility ?? 10000.0) / 1609.34;
+    final visibilityLabel = _visibilityLabel(visibilityMiles);
     final pressureLabel = _pressureLabel(pressureValue);
 
     return GridView.count(
@@ -344,8 +344,8 @@ class _DetailStatsGrid extends StatelessWidget {
         _StatCard(
           icon: Icons.remove_red_eye_outlined,
           label: 'VISIBILITY',
-          value: visibilityKm.toStringAsFixed(0),
-          unit: 'km',
+          value: visibilityMiles.toStringAsFixed(0),
+          unit: 'mi',
           subtitle: visibilityLabel,
         ),
         _StatCard(
@@ -369,10 +369,10 @@ class _DetailStatsGrid extends StatelessWidget {
     return dp.toStringAsFixed(0);
   }
 
-  String _visibilityLabel(double km) {
-    if (km < 1) return 'Poor';
-    if (km < 5) return 'Moderate';
-    if (km < 10) return 'Good';
+  String _visibilityLabel(double miles) {
+    if (miles < 0.5) return 'Poor';
+    if (miles < 3) return 'Moderate';
+    if (miles < 6) return 'Good';
     return 'Clear view';
   }
 
