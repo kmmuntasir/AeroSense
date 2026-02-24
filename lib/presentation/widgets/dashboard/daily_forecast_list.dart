@@ -1,8 +1,8 @@
+import 'package:aero_sense/core/constants/wmo_icons.dart';
+import 'package:aero_sense/core/controllers/weather_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
-import 'package:aero_sense/core/controllers/weather_controller.dart';
-import 'package:aero_sense/core/constants/wmo_icons.dart';
 
 class DailyForecastList extends StatelessWidget {
   const DailyForecastList({super.key});
@@ -84,7 +84,18 @@ class DailyForecastList extends StatelessWidget {
                             ),
                           ),
                         ),
+                        const SizedBox(width: 10),
                         SvgPicture.asset(iconPath, width: 28, height: 28),
+
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: _TempRangeBar(
+                            dayMin: minTemp,
+                            dayMax: maxTemp,
+                            globalMin: globalMin,
+                            globalMax: globalMax,
+                          ),
+                        ),
                         const SizedBox(width: 12),
                         SizedBox(
                           width: 36,
@@ -99,15 +110,6 @@ class DailyForecastList extends StatelessWidget {
                                 FontFeature.tabularFigures(),
                               ],
                             ),
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: _TempRangeBar(
-                            dayMin: minTemp,
-                            dayMax: maxTemp,
-                            globalMin: globalMin,
-                            globalMax: globalMax,
                           ),
                         ),
                         const SizedBox(width: 10),
@@ -175,9 +177,7 @@ class _TempRangeBar extends StatelessWidget {
                 child: Container(
                   height: 8,
                   decoration: const BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [_barStart, _barEnd],
-                    ),
+                    gradient: LinearGradient(colors: [_barStart, _barEnd]),
                     borderRadius: BorderRadius.all(Radius.circular(4)),
                   ),
                 ),

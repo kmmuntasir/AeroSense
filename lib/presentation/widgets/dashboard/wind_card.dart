@@ -1,8 +1,10 @@
 import 'dart:math' as math;
 
+import 'package:aero_sense/core/controllers/weather_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:aero_sense/core/controllers/weather_controller.dart';
+
+import '../../../core/constants/app_colors.dart';
 
 class WindCard extends StatelessWidget {
   const WindCard({super.key});
@@ -29,8 +31,21 @@ class WindCard extends StatelessWidget {
       final condition = controller.windCondition;
 
       return Padding(
-        padding: const EdgeInsets.fromLTRB(16, 0, 8, 16),
-        child: Card(
+        padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.all(Radius.circular(24)),
+            border: BoxBorder.all(color: AppColors.dashboardCardBorder),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.dashboardBoxShadow,
+                offset: const Offset(0, 1),
+                blurRadius: 2,
+                spreadRadius: 0,
+              ),
+            ],
+          ),
           child: Padding(
             padding: const EdgeInsets.all(16),
             child: Column(

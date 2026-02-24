@@ -14,4 +14,6 @@ class AppColors {
   static const Color searchBarBackground = Color(0xFFEDEDED);
   static const Color countryCode = Color(0xFF94A3B8);
   static const Color pageBackground = Color(0xFFF6F6F8);
+  static const Color dashboardCardBorder = Color(0X00f1f5f9);
+  static const Color dashboardBoxShadow = Color(0x0D000000);
 }

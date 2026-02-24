@@ -1,11 +1,7 @@
-import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:aero_sense/core/constants/app_colors.dart';
-import 'package:aero_sense/core/controllers/weather_controller.dart';
 import 'package:aero_sense/core/controllers/location_controller.dart';
 import 'package:aero_sense/core/controllers/weather_controller.dart';
 import 'package:aero_sense/core/models/geocoding_response.dart';
-import 'package:aero_sense/presentation/pages/locations/locations_page.dart';
 import 'package:aero_sense/presentation/widgets/common_bottom_nav.dart';
 import 'package:aero_sense/presentation/widgets/dashboard/air_quality_card.dart';
 import 'package:aero_sense/presentation/widgets/dashboard/current_weather_hero.dart';
@@ -17,35 +13,14 @@ import 'package:aero_sense/presentation/widgets/dashboard/wind_card.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-// ── Shell ─────────────────────────────────────────────────────────────────────
-
-class DashboardPage extends StatefulWidget {
+class DashboardPage extends StatelessWidget {
   const DashboardPage({super.key});
 
   @override
-  State<DashboardPage> createState() => _DashboardPageState();
-}
-
-class _DashboardPageState extends State<DashboardPage> {
-  int _selectedNavIndex = 0;
-
-  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: IndexedStack(
-        index: _selectedNavIndex,
-        children: const [_DashboardTab(), LocationsPage()],
-      ),
-      bottomNavigationBar: CommonBottomNav(
-        selectedIndex: _selectedNavIndex,
-        onLocalTap: (index) {
-          if (index == 0 || index == 1) {
-            setState(() => _selectedNavIndex = index);
-            return true; // consumed locally
-          }
-          return false; // let CommonBottomNav route to /weather-alerts or /settings
-        },
-      ),
+    return const Scaffold(
+      body: _DashboardTab(),
+      bottomNavigationBar: CommonBottomNav(selectedIndex: 0),
     );
   }
 }
